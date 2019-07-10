@@ -8,3 +8,5 @@
 *.fls
 main.pdf
 *.gz
+
+.vscode/*
