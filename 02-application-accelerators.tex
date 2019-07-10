@@ -1,0 +1,24 @@
+%!TEX root = main.tex
+
+\section{Why application specific accelerators?}
+\label{background:accel}
+
+In a general-purpose microprocessor, the overhead of instruction pro- cessing is much higher than the actual operations performed by each instruction.
+This overhead includes the necessary steps to fetch and decode the instructions, provide required operands for the instructions, and perform the necessary bookkeeping to ensure correctness when multiple instructions are executing in the microprocessor.
+Application-specific hardware, also known as accelerators, are faster and lower in power consumption than general-purpose processors because they eliminate most of the overhead of a general purpose processor [17,28,33]. As the result, using accelerators for emerging applications is an active area of research. Although fixed-function accelerators are more energy efficient than software running a general-purpose processor, they are not a suitable solution for applications that change frequently.
+
+FPGA-based accelerators [16,46,50,51,70], however, can be used to provide both performance and flexibility for such applications by trading part of the performance gain for the reconfigurability of the implementation substrate.
+Although the flexibility of FPGAs enables changing the application by reconfiguring the accelerator, their programmability is still a major obstacle for their wide-spread use.
+
+igh-level synthesis (HLS) techniques [19,25] have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application. An HLS tool, ideally, (i) captures various types of parallelism in the input application, (ii) builds the design space of various micro-architectures that exploit the parallelism, and (iii) explores the design space to find the micro-architecture with the lowest silicon area and/or power consumption.
+
+
+\subsection{Reconfigurable Architecture}
+\label{background:reconfigurable}
+
+Recent trends in technology scaling, the availability of large amounts of data, and novel algorithmic breakthroughs have spurred accelerator architecture research. Reconfigurable architectures like field-programmable gate arrays (FPGAs) and coarse-grain reconfigurable architectures (CGRAs) have received renewed interest from academic researchers and industry practitioners alike, primarily due to their potential performance and energy efficiency benefits over conventional CPUs. For instance, FPGAs are now being used to accelerate web search in datacenters at Microsoft and Baidu~\cite{catapult, baidu}, Amazon now offers FPGA instances as part of AWS~\cite{awsf1}, and Intel has announced products like in-package Xeon-FPGA systems~\cite{harp} and FPGA-accelerated storage systems~\cite{nand_flash}. Similarly, several recent research prototypes~\cite{dyser, ti, scaledeep, scnn, plasticine} and startups~\cite{wavecomp, nervana} have explored various kinds of CGRAs at different granularities. Growing use of such reconfigurable architectures has made them more available to programmers now than ever before.
+
+Reconfigurable devices are able to accelerate applications, in part, by exploiting multiple levels of nested parallelism and data locality with custom data pipelines and memory hierarchies. Unfortunately, the same features that make reconfigurable architectures efficient also make them much more complex to program. In FPGAs, an accelerator design must account for the timing between pipelined signals and the physically limited compute and memory resources available on the target device. It must also manage partitioning of data between local scratchpads and off-chip memory to achieve good data locality. The combination of these complexities leads to intractable accelerator design spaces, even for relatively small applications~\cite{cascaval}.
+
+These challenges have caused programmability to be a key limiting factor to widespread adoption of CGRAs and FPGAs~\cite{fpgaMasses,DeSutter2013}. The space of CGRA programmability is currently fragmented with incompatible, architecture-specific programming models. The state of the art in programming FPGAs involves using a combination of vendor-supplied IP blocks, hand-tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM. Hardware description languages (HDLs) like Verilog and VHDL are designed for explicit specification of hardware, placing the burden on the user to solve the complexities of implementing their algorithm in hardware.
+

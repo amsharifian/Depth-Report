@@ -1,111 +1,50 @@
 %!TEX root = main.tex
 
-
 \chapter{Background}
+\label{background}
 
-\section{Why hardware accelerators?}
-Talking about the need of accelerators in general. Why there is a need for more specialization. Here I talk about why we are in era that building hardware accelerators are important. Explain how we started from a Von-Neumann machine go to parallel and heterogeneous machine and ended to designing hardware accelerators.
 
-\section{History of computer architecture:}
-Paper list:
+\input{02-application-accelerators.tex}
+\section{Hand build application specific accelerators}
+\subsection{Y-chart design and different aspect of accelerator design}
 
+\section{Different approaches to HLS}
+\subsection{FSM models}
 \begin{enumerate}
-    \item \bibentry{moore1965cramming}
-    \item \bibentry{dennard1974design}
-    \item \bibentry{danowitz2012cpu}
-    \item \bibentry{tpu-isca2017}
-    \item \bibentry{brainwave-isca2016}
-    \item \bibentry{markovic2012dsp}
-    \item \bibentry{khazraee2017moonwalk}
-    \item \bibentry{hameed2010understanding}
-    \item \bibentry{fuchs2019accelerator}
+    \item Legup
+    \item Vivado and Intel
 \end{enumerate}
 
-\section{How to extend ISA and processors }
-
-\begin{itemize}
-    \item CCA
-    \item SSE/AVX
-    \item VLIW and vector processors
-\end{itemize}
+\subsection{Elastic circuit}
 
 \begin{enumerate}
-    \item \bibentry{lee201445nm}
-    \item \bibentry{gonzalez2000xtensa}
-    \item \bibentry{sankaralingam2006distributed}
-    \item \bibentry{hameed2010understanding}
-    \item \bibentry{zhang2018composable}
-    \item \bibentry{asanovic2015berkeley}
-    \item \bibentry{nikhil1990executing}
-    \item \bibentry{asanovic1998vector}
+    \item CASH
+    \item AHL
+    \item Elastic circuit
 \end{enumerate}
 
-% \section{Multicore and parallelism}
-
-% \begin{itemize}
-%     \item Multicore
-%     \item GPUs
-% \end{itemize}
-
-
-\section{Spatial architectures}
-
-\begin{itemize}
-    \item CGRA/Dyser
-    \item DSL accelerators like Plasticine
-\end{itemize}
-
+\subsection{DSL types}
 \begin{enumerate}
-    \item \bibentry{govindaraju2012dyser}
-    \item \bibentry{nowatzki2016heterogeneous}
-    \item \bibentry{nowatzki2017stream}
+    \item Halide HLS
+    \item Spatial
 \end{enumerate}
 
+\subsection{Library based}
 
-\subsection{Custom accelerators}
 
-At this point, I briefly talk about custom hardware accelerator design methodology and talk about Y-chart to frame when someone wants to design an accelerator how he should think.
-\begin{itemize}
-    \item SystemVerilog/Bluespec and etc.
-    \item DSL languages like Spatial
-    \item HLS
-\end{itemize}
+\section{Chip generators}
 
+This class of hardware design bring configurablity to hand design optimizations. This is critical to use when try to auto generate hardware.
+It's also necessary when someone wants to do DSE.
 \begin{enumerate}
-    \item \bibentry{sujeeth2014delite}
-    \item \bibentry{koeplinger2018spatial}
-    \item \bibentry{prabhakar2017plasticine}
-    \item \bibentry{prabhakar2016generating}
-    \item \bibentry{hegarty2014darkroom}
-    \item \bibentry{ragan2013halide}
-    \item \bibentry{walker1985model}
-    \item \bibentry{mohanty2008low}
-    \item \bibentry{zhang2000review}
-    \item \bibentry{canis2011legup}
-    \item \bibentry{Josipovic-fpga2018}
-    \item \bibentry{choi2013software}
-    \item \bibentry{cong2011high}
+    \item Genesis
+    \item FPTunner
+    \item OpenPinto
+    \item Modular cores
 \end{enumerate}
 
-
-\subsection{What will we build now?}
-
-What do we need for building a hardware accelerator generator?
-
-The goal of Accelerator generator is to provides a framework to iteratively optimize an accelerator, built base on an input software. At this point, we deviate from HSL goal which is designing an efficient hardware accelerator using software language. We believe, by expressing algorithm using input languages, we can provide a framework to abstract hardware designer ideas as a set of optimization passes. We believe that while someone can build an accelerator using HLS/software language. But still the input becomes limited. However, a hardware designer needs to stay with three important concepts to express his ideas as a set of optimization passes. This features are hardware designer tools in our framework to bring his new idea in the context of hardware accelerator designs. Chisel as a hardware generator language gives us freedom to be modular, extensible and configurable.
-
-These are the list of lessons we learned from chip generators. And now we are applying them in the domain of hardware accelerator while the input is an algorithm.
-
+\subsection{Hardware generator languages}
 \begin{enumerate}
-    \item \textbf{Modularity:} Hardware design is modular inherently. It composes from different pieces to build a new system.
-    \item \textbf{Configurability:} Each module has its own configurations. For instance, in your generator your memory modules need to be completely configure. And this configuration affects the rest of the system. Each configuration can not be done in isolation.
-    \item \textbf{Extensibility:} There is no perfect hardware designed for a perfect software. We always need to keep in mind that perfect software can be defined only if perfect hardware exist. However, both of hardware an software are moving targets.
+    \item Chisel, Firrtl
+    \item Rocket core
 \end{enumerate}
-
-
-\begin{enumerate}
-    \item Rocket chip generator
-    \item FPU tunner
-    \item Genesis2
-\end{enumerate}
-

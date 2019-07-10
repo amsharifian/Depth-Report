@@ -6,3 +6,5 @@
 *.toc
 *.fdb_latexmk
 *.fls
+main.pdf
+*.gz
