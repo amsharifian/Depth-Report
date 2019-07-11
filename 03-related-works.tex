@@ -86,6 +86,11 @@ PolyMage~\cite{mullapudi_asplos_2015_polymage}
 % * generate high-level synthesis tool
 % * line buffer
 
+\section{Domain Specific Languages}
+
+\subsection{Spatial}
+Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
+
 \section{HDLs}
 %
 \subsection{Bluespec SystemVerilog}
@@ -101,23 +106,20 @@ Chisel~\cite{bachrach_dac_2012_chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriSc
 % * Improve modular hardware library design
 %
 
-\subsection{Genesis2}
+\subsection{Firrtl}
+Firrtl~\cite{izraelevitz_2017_firrtl_reusability, li_2016_firrtl_specification}
+% * Compiler
+
+\subsection{Genesis2/ OpenPiton}
 Genesis2~\cite{genesis2}
 % * Adds Perl scripting support to SystemVerilog
 % * Improve procedural generation
 %
+OpenPiton~\cite{balkind_asplos_2016_openpiton}
+% * written in industry standard Verilog
+% * FPGA synthesis scripts as well as ASIC backend scripts.
+
 \paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
-
-% \section{Chip generators}
-
-% This class of hardware design bring configurablity to hand design optimizations. This is critical to use when try to auto generate hardware.
-% It's also necessary when someone wants to do DSE.
-% \begin{enumerate}
-%     \item Genesis
-%     \item FPTunner
-%     \item OpenPinto
-%     \item Modular cores
-% \end{enumerate}
 
 % \subsection{Hardware generator languages}
 % \begin{enumerate}
