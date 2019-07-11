@@ -13,7 +13,12 @@ Chimps~\cite{chimps}, CASH~\cite{budiu_pegasus_2002,budiu_cash_2002}, AHRL~\cite
 
 \subsection{Bluespec}
 Bluespec~\cite{bluespec}
-% * generates hardware from purely functional descriptionA
+% * generates hardware from purely functional description
+% * Rule based hardware design language
+% * The rules are atomic operations predicated with a condition.
+% * They give the impression of freezing the rest of the system when a given rule’s action is carried out after the rule’s predicate is true.
+% * There is an implicit parallelism in this specification, because it is possible for multiple rules to be activated and executed in parallel.
+% *The compiler automatically schedules the rules such that they are either conflict-free or combined sequentially to preserve the promised atomicity semantic.
 %
 
 \subsection{Vivado/Autopilot / Legup / Intel's FPGA SDK for OpenCL, and SDAccel}
@@ -31,8 +36,12 @@ ElasticFlow~\cite{elasticFlow} / CGPA~\cite{cgpa} / Dynamic schedule dataflow~\c
 % * generate coarse-grained pipelines using FIFOs in between stages for communication.
 %
 
-\subsection{Kiwi}
+\subsection{Gorill}
+Gorill~\cite{lavasani_thesis}
+% * Gorilla++ generates custom hardware for applications with irregular dataflow 
+% * support multi-threading and lock-based synchronization
 
+\subsection{Kiwi}
 Kiwi~\cite{kiwi}
 % * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
 
