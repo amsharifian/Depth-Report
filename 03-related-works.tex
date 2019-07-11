@@ -1,5 +1,126 @@
 %!TEX root = main.tex
 
-\section{Related works}
+% Notes 
 
-High-level synthesis (HLS) techniques~\cite{jcong_hls,canis_2011_legup, vivado} have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application. An HLS tool, ideally, (i) captures various types of parallelism in the input application, (ii) builds the design space of various micro-architectures that exploit the parallelism, and (iii) explores the design space to find the micro-architecture with the lowest silicon area and/or power consumption.
+\section{Hardware from High-level languages}
+
+\subsection{Chimps, CASH, AHL}
+
+Chimps~\cite{chimps}, CASH~\cite{budiu_pegasus_2002,budiu_cash_2002}, AHRL~\cite{ahrl}
+% * Generate hardware from ANSI C
+% * mapping each C language construct in a dataflow graph to an HDL block.
+%
+
+\subsection{Bluespec}
+Bluespec~\cite{bluespec}
+% * generates hardware from purely functional descriptionA
+%
+
+\subsection{Vivado/Autopilot / Legup / Intel's FPGA SDK for OpenCL, and SDAccel}
+
+Vivado/Autopilot~\cite{vivado,vivadohls,autopilot} /Legup~\cite{canis_2011_legup} / Intel's FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel}
+% * Applications can be expressed at a high level, in terms of arrays and untimed, nested loops.
+% * commercial HLS tool that generates hardware from C/C++/SystemC languages
+% * Imperative design description
+%
+
+\subsection{ElasticFlow / CGPA}
+
+ElasticFlow~\cite{elasticFlow} / CGPA~\cite{cgpa} / Dynamic schedule dataflow~\cite{josipovic_fpga_2018_dynamically}
+% * More recent works like ElasticFlow and CGPA
+% * generate coarse-grained pipelines using FIFOs in between stages for communication.
+%
+
+\subsection{Kiwi}
+
+Kiwi~\cite{kiwi}
+% * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
+
+\subsection{Lime}
+Lime~\cite{lime}
+% * hardware from functional parallel patterns. (map, reduce, split, join)
+% * Java and automatically targets CPUs, GPUs, and FPGAs
+%
+
+\subsection{CMOST/ParallelXL}
+CMOST~\cite{zhang_DAC_2015_cmost}, ParallelXL~\cite{chen_micro_2018_parallelXL}
+% * C-to-FPGA framework that uses task-level modeling
+
+
+
+\section{Image Processing DSLs}
+
+\subsection{HIPACC}
+HIPACC~\cite{membarth_2016_hipa}
+% * source - to - source C like compiler
+% * generate CUDA, openCL, Renderscripts target GPU
+% * make use of different memory hierarchy based on limit set of access pattern
+% * support fix set of reduction function
+% * unroll only if kernel size is known
+% * heuristic pick best configuration (similar to our DSE)
+%
+
+\subsection{Rigel}
+Rigel~\cite{hegarty_2016_rigel}
+% * Generate verilog
+% * Coarse-grain pipeline
+% * very similar control semantics to plasticine. Use
+% tokens/back pressure to allow each pipeline stage to fire at their perspective rate
+% * Multi-rate line buffer template
+%
+
+\subsection{Darkroom}
+Darkroom~\cite{darkroom}
+% * target ASIC, FPGA, fast CPU
+% * generate structured verilog
+% * line buffer
+% * scheduling for inner loop pipeline. Use ILP to improve pipeline delay
+%
+
+\subsection{PolyMage}
+PolyMage~\cite{mullapudi_asplos_2015_polymage}
+% * point=wise, stencil, sampling, operation
+% * functional (in a kind of awkward way)
+% * python
+% * generate openMP/C++
+% * generate high-level synthesis tool
+% * line buffer
+
+\section{HDLs}
+%
+\subsection{Bluespec SystemVerilog}
+Bluespec SystemVerilog~\cite{bluespec}
+% * Loops are expressed by state machines
+% * state machine inference from nested while loops
+% 
+
+\subsection{Chisel/ MyHDL/ VeriScala / PyMTL}
+Chisel~\cite{bachrach_dac_2012_chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
+% * Embed HDL in software languages like Scala or Python
+% * Adding support for meta-programming 
+% * Improve modular hardware library design
+%
+
+\subsection{Genesis2}
+Genesis2~\cite{genesis2}
+% * Adds Perl scripting support to SystemVerilog
+% * Improve procedural generation
+%
+\paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
+
+% \section{Chip generators}
+
+% This class of hardware design bring configurablity to hand design optimizations. This is critical to use when try to auto generate hardware.
+% It's also necessary when someone wants to do DSE.
+% \begin{enumerate}
+%     \item Genesis
+%     \item FPTunner
+%     \item OpenPinto
+%     \item Modular cores
+% \end{enumerate}
+
+% \subsection{Hardware generator languages}
+% \begin{enumerate}
+%     \item Chisel, Firrtl
+%     \item Rocket core
+% \end{enumerate}
