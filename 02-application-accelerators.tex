@@ -27,12 +27,13 @@ Reconfigurable devices, usually, accelerates part of the application which conta
 They can exploit: 1)multiple levels of nested parallelism, 2)data locality with custom data pipelines and 3)defining custom memory hierarchies.
 Unfortunately, all the features that make reconfigurable architectures efficient also make them much more complex to program.
 For instance, in FPGAs, an accelerator design must account for the timing between pipelined signals and the physically limited compute and memory resources available on the target device.
-It must also manage partitioning of data between local scratchpads and off-chip memory to achieve good data locality.
+It must also manage partitioning of data between local scratchpads and off-chip memory to achieve good data locality~\cite{gzip_2013_fpga}.
 The combination of these complexities leads to intractable accelerator design spaces, even for relatively small applications~\cite{cascaval_taxonomy_accelerator}.
 
+These challenges have caused programmability to be a key limiting factor to widespread adoption of reconfigurable architectures~\cite{fpga_masses, cgra_architecture}.
+Currently, the state of the art in programming FPGAs involves using a combination of vendor-supplied IP blocks, hand tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM.
 
-These challenges have caused programmability to be a key limiting factor to widespread adoption of CGRAs and FPGAs~\cite{fpgaMasses,DeSutter2013}. The space of CGRA programmability is currently fragmented with incompatible, architecture-specific programming models. The state of the art in programming FPGAs involves using a combination of vendor-supplied IP blocks, handtuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM. Hardware description languages (HDLs) like Verilog and VHDL are designed for explicit specification of hardware, placing the burden on the user to solve the complexities of implementing their algorithm in hardware.
+Considering the above challenges, hardware designers use hardware description languages (HDLs) such as Verilog and VHDL to implement algorithm in hardware.
+But these languages are designed for explicit specification of hardware, and they are aboard to express higher level information that exists at the algorithm level.
 
-
-High-level synthesis (HLS) techniques~\cite{jcong_hls,canis_2011_legup, vivado} have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application. An HLS tool, ideally, (i) captures various types of parallelism in the input application, (ii) builds the design space of various micro-architectures that exploit the parallelism, and (iii) explores the design space to find the micro-architecture with the lowest silicon area and/or power consumption.
-
+To overcome these challenges, there different approaches proposed which we look at them at the related works section.
