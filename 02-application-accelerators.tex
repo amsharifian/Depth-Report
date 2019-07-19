@@ -46,6 +46,19 @@ In summary, we define design synthesis, broadly speaking, as a translation proce
 \section{Languages, Design and Technologies}
 Synthesis systems must allow for making design tradeoffs using different design styles for different technologies and design goals.
 
+Some design methodologies like pipelining can be abstracted into language constructs to provide better understanding and simpler synthesis algorithms.
+
+Unfortunately, each design can be described or modeled using a single language in several different ways.A
+
+Similarly, a design implementation is not unique.For each function in the design, there are several design styles suitable for different design goals or constraints.
+
+HLS still lacks a formalism of the type already developed for layout and logic synthesis. HLS uses formalisms based on several different areas, varying from the programming-language paradigm for the behavioral description to layout models for cost and performance estimation.
+
+
+The main problem with a design description is its change with the design over time. At the beginning, the description is vague, with little or no implementation detail. More detail is added as the design evolves, and the level of abstraction is lowered until the design is ready for manufacturing. A language that spans all the levels of abstraction would be desirable from a management point of view but would be too cumbersome to be mastered by designers, who work only on one or two levels of abstractions.
+
+Furthermore, different members of the design team require different aspects of a design, for reasons of verifiability, testability, reliability, information needed by those experts to one language known to everybody would produce a very rich language in which information for any particular aspect of the design would be difficult to find.
+
 \section{Hardware design methodology}
 
 In order to explain the different design methodologies, we use the Y-Chart, which was introduced in 1983 by Gajski and Kuhn~\cite{gajski_1992_high} and refined by Walker and Thomas~\cite{walker_1985_y_model}.
