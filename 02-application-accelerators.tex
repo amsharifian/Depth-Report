@@ -22,22 +22,26 @@ As an alternative to fixed-function accelerators, reconfigurable architectures l
 For instance, FPGAs are now being used to accelerate web search in datacenters at Microsoft and Baidu~\cite{catapult, baidu}, Amazon now offers FPGA instances as part of AWS~\cite{awsf1}, and Intel has announced products like in-package Xeon-FPGA systems~\cite{harp} and FPGA-accelerated storage systems~\cite{nand_flash}. Similarly, several recent research prototypes~\cite{dyser, triggered_instruction, scaledeep, scnn, plasticine, cgra_me} have explored various kinds of CGRAs at different granularity. Growing use of such reconfigurable architectures has made them more available to programmers now than ever before.
 Although the flexibility of reconfigurable architectures enables changing the application by reconfiguring the accelerator, their programmability is still a major obstacle for their wide spread use.
 
-\textbf{Challenges:}
+\section{The need for Design Automation on Higher Abstraction Levels}
+
 Reconfigurable devices, usually, accelerates part of the application which contains regular control flow and abundant data parallelism to achieve high performance and efficiency~\cite{spatial_computation, trips, govindaraju_hpca_2011}.
 They can exploit: 1)multiple levels of nested parallelism, 2)data locality with custom data pipelines and 3)defining custom memory hierarchies.
-Unfortunately, all the features that make reconfigurable architectures efficient also make them much more complex to program.
+Unfortunately, \textit{all the features that make reconfigurable architectures efficient also make them much more complex to program.}
 For instance, in FPGAs, an accelerator design must account for the timing between pipelined signals and the physically limited compute and memory resources available on the target device.
 It must also manage partitioning of data between local scratchpads and off-chip memory to achieve good data locality~\cite{gzip_2013_fpga}.
 The combination of these complexities leads to intractable accelerator design spaces, even for relatively small applications~\cite{cascaval_taxonomy_accelerator}.
 
-These challenges have caused programmability to be a key limiting factor to widespread adoption of reconfigurable architectures~\cite{fpga_masses, cgra_architecture}.
-Currently, the state of the art in programming FPGAs involves using a combination of vendor-supplied IP blocks, hand tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM.
+These challenges have caused \emph{programmability} to be a key limiting factor to widespread adoption of reconfigurable architectures~\cite{fpga_masses, cgra_architecture}.
 
-Considering the above challenges, hardware designers use hardware description languages (HDLs) such as Verilog and VHDL to implement algorithm in hardware.
-But these languages are designed for explicit specification of hardware, and they are aboard to express higher level information that exists at the algorithm level.
+\textbf{Design productivity gap}
+% The Semiconductor Industry Association (SIA)2 shows that a design productivity gap exists between the available chip capacity and the current design capabilities. Figure 2.3 plots Moore’s Law, together with the productivity growth, expressed in transistors per staff member per month over the last decades. Due to improving engineering skills, an increase in the number of transistors that one designer can handle can be observed. The pace at which the design productivity increases is, however, much smaller than the slope of Moore’s Low. That is, whereas Moore’s Low predicts that the chip capacity doubles every eighteen months, the hardware design productivity in the past few years is estimated to increase at 1.6× over the same period of time. As can be seen from Figure 2.3, the design productivity gap originate from the 1980s. At that moment, it became clear that it was no longer possible in digital design to cope with every transistor individually. This ”design crisis” was the driven force behind the introduction of design abstraction levels [Bell and Newell, 1971] together with well-defined design methodologies and the advent of the automation of the design of electronic systems and circuits (Electronic Design Automation (EDA)) [Lavagno et al., 2006]. Hence, design methodologies become a popular research topic to tackle these aforementioned design challenges of embedded systems in the recent decade.
 
-To overcome these challenges, there different approaches proposed which we look at them at the related works section.
 
+% Currently, there are two schools of toughs to program FPGAs. The first technique is capture-and-simulation school believes that human designers have very good design knowledge accumulated through experience that \emph{cannot be automated}. In this case, programming FPGAs involves using a combination of vendor-supplied IP blocks, hand tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM.
+
+% The second school believes to describe the design and high level and synthesis from description. This school believes that a top-down methodology, in which designers describe the intent of the design and automation tool's add detailed structure, would be better suited for the complex designs. This approach focuses on definition of description languages, design models and synthesis algorithms. In this model, designers' intuition can substantially reduce the search through the design space.
+
+% \paragraph{Describing Y-Chart here to clarify both thoughts}
 
 \section{Levels of abstraction}
 
