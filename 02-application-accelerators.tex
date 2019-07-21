@@ -57,6 +57,22 @@ different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model}
 Y-Chart divides design representation into three domains:1)Behavioral, it can also called functionality and specification, 2)Structural, also called netlist or a block diagram and 3)Physical, usually called layout or board design. Behavior represents a design as a black-box but it describes the output base on inputs over time. What behavior representation doesn't specify is how the black-box is structured or how to build the black-box. This is the task of structural representation. In this specification, black-box is represented as a set of components and connections. While, it's possible to drive the behavior of black-box from its components and its connections but understanding the behavior can be very difficult since it is obscured by the details of each component and connection.
 Eventually, physical design describe different dimension of each component.
 
+The Y-chart also defines multiple level of abstractions for a design by drawing concentric circles on the Y. Typically, four levels are used: system, processor, logic and circuit levels.
+The name of each abstraction level is derived from the types of the components generated on that abstraction level.
+For instance, on the processor level, we generate standard and custom processors, or special-hardware components such as memory controllers, arbiters, brides and various interface components. At the higher level, system level, we design standard or embedded systems consisting of processors, memories, buses, and other processor components.
+
+Let's look at binary counter as an example. In this example at the algorithmic-level, we only know that at every cycle the input value will be increased by one and the output in the next cycle would be the input plus one.
+At the next lower level, we understand that to carry out this function some sort of register is needed to hold the value of the counter.
+We can state this idea using a register transfer statement such as $AC \leftarrow AC + 1$.
+On the structural side, the register consists of gates and flip-flops, which themselves consist of transistors.
+
+\paragraph{Synthesis:}On each abstraction level, we need a library of components to be used in building \emph{the structure} for a given \emph{behavior}.
+This process of converting the given behavior into a structure for a given haviour is called \emph{synthesis}.
+On the other hand, if each component in the library is given with its structure and
+the physical implementation, we can proceed with physical design.
+Thus each component in the database may have up to three different models representing
+three different axes in the Y-Chart: behavior or function; structure, which
+contains the components from the lower level of abstraction; and the physical.
 
 
 % \subsection{Hardware Design Methodologies}
@@ -74,29 +90,18 @@ Eventually, physical design describe different dimension of each component.
 
 % \paragraph{Describing Y-Chart here to clarify both thoughts}
 
-\section{Languages, Design and Technologies}
-Synthesis systems must allow for making design tradeoffs using different design styles for different technologies and design goals.
+% \section{Languages, Design and Technologies}
+% Synthesis systems must allow for making design tradeoffs using different design styles for different technologies and design goals.
 
-Some design methodologies like pipelining can be abstracted into language constructs to provide better understanding and simpler synthesis algorithms.
+% Some design methodologies like pipelining can be abstracted into language constructs to provide better understanding and simpler synthesis algorithms.
 
-Unfortunately, each design can be described or modeled using a single language in several different ways.A
+% Unfortunately, each design can be described or modeled using a single language in several different ways.A
 
-Similarly, a design implementation is not unique.For each function in the design, there are several design styles suitable for different design goals or constraints.
+% Similarly, a design implementation is not unique.For each function in the design, there are several design styles suitable for different design goals or constraints.
 
-HLS still lacks a formalism of the type already developed for layout and logic synthesis. HLS uses formalisms based on several different areas, varying from the programming-language paradigm for the behavioral description to layout models for cost and performance estimation.
+% HLS still lacks a formalism of the type already developed for layout and logic synthesis. HLS uses formalisms based on several different areas, varying from the programming-language paradigm for the behavioral description to layout models for cost and performance estimation.
 
 
-The main problem with a design description is its change with the design over time. At the beginning, the description is vague, with little or no implementation detail. More detail is added as the design evolves, and the level of abstraction is lowered until the design is ready for manufacturing. A language that spans all the levels of abstraction would be desirable from a management point of view but would be too cumbersome to be mastered by designers, who work only on one or two levels of abstractions.
+% The main problem with a design description is its change with the design over time. At the beginning, the description is vague, with little or no implementation detail. More detail is added as the design evolves, and the level of abstraction is lowered until the design is ready for manufacturing. A language that spans all the levels of abstraction would be desirable from a management point of view but would be too cumbersome to be mastered by designers, who work only on one or two levels of abstractions.
 
-Furthermore, different members of the design team require different aspects of a design, for reasons of verifiability, testability, reliability, information needed by those experts to one language known to everybody would produce a very rich language in which information for any particular aspect of the design would be difficult to find.
-
-\section{Hardware design methodology}
-
-In order to explain the different design methodologies, we use the Y-Chart, which was introduced in 1983 by Gajski and Kuhn~\cite{gajski_1992_high} and refined by Walker and Thomas~\cite{walker_1985_y_model}.
-The Gajski-Kuhn Y-chart is depicted in Figure 2.4(a). This model of design representation is described using three axes, each representing one of three domains of description-behavioral, structural, and physical. The
-
-\begin{enumerate}
-    \item \textbf{Behavioral: } Describes the behavior or the functionality of an algorithm.
-    \item \textbf{Structural: } Describes the abstract implementation, or logical structure, of the design as a hierarchy of components and their interconnection.
-    \item \textbf{Physical: }  Describes the physical implementation of the design.
-\end{enumerate}
+% Furthermore, different members of the design team require different aspects of a design, for reasons of verifiability, testability, reliability, information needed by those experts to one language known to everybody would produce a very rich language in which information for any particular aspect of the design would be difficult to find.
