@@ -140,7 +140,7 @@ Gorill~\cite{lavasani_thesis}
 \subsection{Kiwi}
 Kiwi~\cite{kiwi}
 % * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
-Kiwi [70] translates a set of C# parallel constructs (e.g., event, monitor,
+Kiwi translates a set of $C\#$ parallel constructs (e.g., event, monitor,
 and lock) to corresponding hardware units.
 
 \subsection{Lime}
@@ -205,6 +205,36 @@ Genesis2~\cite{genesis2}
 OpenPiton~\cite{balkind_asplos_2016_openpiton}
 % * written in industry standard Verilog
 % * FPGA synthesis scripts as well as ASIC backend scripts.
+
+Genesis2 uses Perl to provide more flexible parameterization and elaboration of hardware blocks written in SystemVerilog.
+
+OpenPiton has been designed as a platform to enable atscale manycore research. An explicit design goal of OpenPiton is that it should be easy to use by other researchers. To
+support this, OpenPiton provides a high degree of integration and configurability. Unlike many other designs where
+the pieces are provided, but it is up to the user to compose
+them together, OpenPiton is designed with all of the components integrated into the same easy to use build infrastructure providing push-button scalability. Computer architecture researchers can easily deploy OpenPiton’s source code,
+add in modifications and explore their novel research ideas
+in the setting of a fully working system. Over 8000 targeted,
+high-coverage test cases are provided to enable researchers
+to innovate with a safety net that ensures functionality is
+maintained. OpenPiton’s open source nature also makes it
+easy to release modifications and reproduce previous work
+for comparison or reuse.
+Beyond being a platform designed by computer architects for use by computer architects, OpenPiton enables researchers in other fields including OS, security, compilers,
+runtime tools, systems, and even CAD tool design to conduct research at-scale. In order to enable such a wide range
+of applications, OpenPiton is configurable and extensible.
+The number of cores, attached I/O, size of caches, number
+of TLB entries, presence of an FPU, number of threads, and
+network topology are all configurable from a single configuration file. OpenPiton is easy to extend; the presence of a
+well documented core, a well documented coherence protocol, and an easy to interface NoC make adding research
+features easy. Research extensions to OpenPiton that have
+already been built include several novel memory system explorations, an Oblivious RAM controller, and a new in-core
+thread scheduler. The validated and mature ISA and software
+ecosystem support OS and compiler research. The release of
+OpenPiton’s ASIC synthesis, FPGA synthesis, and back-end
+(Place and Route) scripts make it easy for others to port to
+new process technologies or FPGAs. In particular, this enables CAD researchers who need large netlists to evaluate
+their algorithms at-scale.
+
 
 \paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
 
