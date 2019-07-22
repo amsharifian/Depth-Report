@@ -4,6 +4,99 @@
 
 \section{Hardware from High-level languages}
 
+We discuss different languages and their level of abstraction to translates their behavioral specification to structured specification.
+
+\section{HDLs}
+While their syntax is at least reminiscent of high-level software languages, the specification of a circuit in an HDL is different from writing a software program. Software programs have a sequential execution model in which correctness is defined as the execution of each instruction or function in the order it is written.
+The movement of data is implicit and is left to the underling hardware.
+
+Memory accesses are inferred, and processors provide implicit support for interfaces to memory. By contrast, hardware designs consist of blocks of circuitry that all run concurrently. Data movement is written explicitly into the model, in the form of wires and ports. Memory and memory accesses must be explicitly declared and handled [Martinez et al., 2008]. Listing 2.1 shows the VHDL implementation of a 1-bit half adder along with its RTL implementation in Figure 2.10. A half adder adds two input bits A and B and generates two outputs a carry and sum. Table 2.1 shows the truth table of a half adder.
+
+
+Hardware description languages like Verilog and VHDL are designed for arbitrary circuit description. In order to achieve maximum generality, they require users to explicitly manage timing, control signals, and local memories. Loops are expressed by state machines in flattened RTL.
+One exception to this is Bluespec SystemVerilog \cite{bluespec}, which supports state machine inference from nested while loops.
+Recent advancements in HDLs have largely been aimed at meta-programming improvements and increasing the size of hardware module libraries.
+Languages like Chisel~\cite{chisel}, MyHDL~\cite{myhdl} and VeriScala~\cite{veriscala} make procedural generation of circuits simpler by embedding their HDL in a software language (e.g. Scala or Python). Similarly, Genesis2~\cite{genesis2} adds Perl scripting support to SystemVerilog to help drive procedural generation. While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
+%For application accelerators, such a low level of abstraction is often too tedious.
+
+
+
+
+%
+\subsection{Bluespec SystemVerilog}
+Bluespec SystemVerilog~\cite{bluespec}
+% * Loops are expressed by state machines
+% * state machine inference from nested while loops
+% 
+
+\subsection{Spatial}
+Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
+
+
+\subsection{Chisel/ MyHDL/ VeriScala / PyMTL}
+Chisel~\cite{bachrach_dac_2012_chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
+% * Embed HDL in software languages like Scala or Python
+% * Adding support for meta-programming 
+% * Improve modular hardware library design
+%
+
+The dominant traditional hardware-description languages
+(HDLs), Verilog and VHDL, were originally developed as
+hardware simulation languages, and were only later adopted
+as a basis for hardware synthesis. Because the semantics of
+these languages are based around simulation, synthesizable
+designs must be inferred from a subset of the language, complicating tool development and designer education. These
+languages also lack the powerful abstraction facilities that
+are common in modern software languages, which leads to
+low designer productivity by making it difficult to reuse components. Constructing efficient hardware designs requires
+extensive design-space exploration of alternative system microarchitectures [9] but these traditional HDLs have limited
+module generation facilities and are ill-suited to producing
+and composing the highly parameterized module generators
+required to support thorough design-space exploration. Recent extensions such as SystemVerilog improve the type system and parameterized generate facilities but still lack many
+powerful programming language features.
+To work around these limitations, one common approach
+is to use another language as a macro processing language
+for an underlying HDL. For example, Genesis2 uses Perl to
+provide more flexible parameterization and elaboration of
+hardware blocks written in SystemVerilog [9]. The language
+called Verischemelog [6] provides a Scheme syntax for specifying modules in a similar format to Verilog. JHDL [1]
+equates Java classes with modules. HML [7] uses standard
+ML functions to wire together a circuit. These approaches
+allow familiar and powerful languages to be macro languages
+for hardware netlists, but effectively require leaf components
+of the design to be described in the underlying HDL. This
+combined approach is cumbersome, combining the poor abstraction facilities of the underlying HDL with a completely
+different high-level programming model that does not understand hardware types and semantics.
+An alternative approach is to begin from a domain-specific
+application programming language from which a hardware
+block is generated. Esterel [2] uses event-based statements
+to program hardware for reactive systems. DIL [4] is an intermediate language targeted at stream processing and hardware virtualization. Bluespec [3] supports a general concurrent computation model, based on guarded atomic actions.
+generator to explore this design space in detail.
+
+
+In this paper, we introduce Chisel (Constructing Hardware In a Scala Embedded Language), a new hardware design language we have developed based on the Scala programming language [8]. Chisel is intended to be a simple
+platform that provides modern programming language features for accurately specifying low-level hardware blocks,
+but which can be readily extended to capture many useful high-level hardware design patterns. By using a flexible
+platform, each module in a project can employ whichever
+design pattern best fits that design, and designers can freely
+combine multiple modules regardless of their programming
+model. Chisel can generate fast cycle-accurate C++ simulators for a design, or generate low-level Verilog suitable for
+either FPGA emulation or ASIC synthesis with standard
+tools. We present several design examples and results from
+emulation and synthesis experiments.
+While these can provide great designer productivity when
+the task in hand matches the pattern encoded in the application programming model, they are a poor match for tasks
+outside their domain. For example, the design of a programmable microprocessor is not well described in a stream
+programming model, and guarded atomic actions are not a
+natural way to express a high-level DSP algorithm. Furthermore, in general it is difficult to derive an efficient microarchitecture from a higher-level computation model, especially
+if the goal is a programmable engine to run many applications, where the human designer would prefer to write a
+
+\subsection{Firrtl}
+Firrtl~\cite{izraelevitz_2017_firrtl_reusability, li_2016_firrtl_specification}
+% * Compiler
+
+
+
 \subsection{Intorduction to HLS}
 \cite{gajski_1994_introduction}
 
@@ -47,12 +140,15 @@ Gorill~\cite{lavasani_thesis}
 \subsection{Kiwi}
 Kiwi~\cite{kiwi}
 % * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
+Kiwi [70] translates a set of C# parallel constructs (e.g., event, monitor,
+and lock) to corresponding hardware units.
 
 \subsection{Lime}
 Lime~\cite{lime}
 % * hardware from functional parallel patterns. (map, reduce, split, join)
 % * Java and automatically targets CPUs, GPUs, and FPGAs
 %
+Lime is a Java-based programming model and runtime from IBM which aims to provide a single unified language to program heterogeneous architectures. Lime natively supports custom bit precisions and includes collection operations, with parallelism in such operations inferred by the compiler. Coarse-grained pipeline and data parallelism are expressed through ``tasks''. Coarse-grained streaming computation graphs can be constructed using built-in constructs like \texttt{\small{connect}}, \texttt{\small{split}}, and \texttt{\small{join}}. The Lime runtime system handles buffering, partitioning, and scheduling of stream graphs. However, coarse-grained pipelines which deviate from the streaming model are not supported, and the programmer has to use a low-level messaging API to handle coarse-grained graphs with feedback loops. Additionally, the compiler does not perform automatic design tuning. Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
 
 \subsection{CMOST/ParallelXL}
 CMOST~\cite{zhang_DAC_2015_cmost}, ParallelXL~\cite{chen_micro_2018_parallelXL}
@@ -99,28 +195,7 @@ PolyMage~\cite{mullapudi_asplos_2015_polymage}
 % * line buffer
 
 
-\section{HDLs}
-%
-\subsection{Bluespec SystemVerilog}
-Bluespec SystemVerilog~\cite{bluespec}
-% * Loops are expressed by state machines
-% * state machine inference from nested while loops
-% 
-
-\subsection{Spatial}
-Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
-
-
-\subsection{Chisel/ MyHDL/ VeriScala / PyMTL}
-Chisel~\cite{bachrach_dac_2012_chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
-% * Embed HDL in software languages like Scala or Python
-% * Adding support for meta-programming 
-% * Improve modular hardware library design
-%
-
-\subsection{Firrtl}
-Firrtl~\cite{izraelevitz_2017_firrtl_reusability, li_2016_firrtl_specification}
-% * Compiler
+\subsection{Generators}
 
 \subsection{Genesis2/ OpenPiton}
 Genesis2~\cite{genesis2}
