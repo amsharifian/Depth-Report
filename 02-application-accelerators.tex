@@ -73,21 +73,19 @@ For any design in order to achieve maximum generality, they require users to exp
 
 A big limitation of HDL languages is that these languages lack the powerful abstraction facilities that
 are common in modern software languages, which leads to low designer productivity by making it difficult to reuse components~\cite{shacham_rethinking_2010}.
+Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures but traditional HLDs have limited module generation facilities and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
+Recent extensions such as SystemVerilog improve the type system and parameterized generate facilities but still lack many powerful programming language features.
+
+
 The key benefit of reusing hardware components is that every time a chip is built, we inherently evaluate different design decisions, either implicitly using microarchitectural and domain knowledge, or explicitly through custom evaluation tools.
 Rather than building a custom chip, designers create a template, a chip generator, that can generate the specialized chip, similar to the way Tensilica’s tools create customized processors~\cite{tensillica}.
 
-Constructing efficient hardware designs requires
-extensive design-space exploration of alternative system microarchitectures [9] but these traditional HDLs have limited module generation facilities and are illsuited to producing
-and composing the highly parameterized module generators
-required to support thorough design-space exploration. Recent extensions such as SystemVerilog improve the type system and parameterized generate facilities but still lack many
-powerful programming language features.
 
 
-
-Therefore, we propose rethinking how weapproach design. The key is realizing that, al-though we can’t afford to build a customizedchip for every application, we can reuse oneapplication’s design process to generate mul-tiple new chips.
-Although this process could help create other, similar chips,today we settle on a particular target imple-mentation and record our solution. Ourapproach embeds this implicit and explicitknowledge in the modules we construct, en-abling us to customize the system for differ-ent goals or constraints, and thus to createdifferent chip instances.
-specialized chip, similar to the way Tensili-ca’s tools create customized processors(http://www.tensilica.com).
-Creating flexible, domain-specific chipgenerators rather than single chip instanceslets us preserve and enhance knowledgefrom past designs. We can then use thatknowledge to produce new customized solu-tions by capturing, not only the final design,but also the tools and trade-off analysis thatled to this design. In this approach, thechip generator uses a fixed system architec-ture (ortemplate)tomakebothsoftwarede-velopment and verification simpler, but itsinternal blocks are flexible, with manyparameters set by either the application de-signer or through optimization scripts.Thus, when application designers port theirapplications to this hardware base, they cancustomize the software and hardware simul-taneously. In addition, the template containshighly parameterized modules to enable per-vasive hardware customization. The applica-tion developer tunes the parameters to meeta desired specification. Then, this informa-tion is compiled, and optimization proce-dures are deployed to produce the finalchip. The end result of this process is achip with customized functional units andmemories that increase computing efficiency.
+% Therefore, we propose rethinking how weapproach design. The key is realizing that, al-though we can’t afford to build a customizedchip for every application, we can reuse oneapplication’s design process to generate mul-tiple new chips.
+% Although this process could help create other, similar chips,today we settle on a particular target imple-mentation and record our solution. Ourapproach embeds this implicit and explicitknowledge in the modules we construct, en-abling us to customize the system for differ-ent goals or constraints, and thus to createdifferent chip instances.
+% specialized chip, similar to the way Tensili-ca’s tools create customized processors(http://www.tensilica.com).
+% Creating flexible, domain-specific chipgenerators rather than single chip instanceslets us preserve and enhance knowledgefrom past designs. We can then use thatknowledge to produce new customized solu-tions by capturing, not only the final design,but also the tools and trade-off analysis thatled to this design. In this approach, thechip generator uses a fixed system architec-ture (ortemplate)tomakebothsoftwarede-velopment and verification simpler, but itsinternal blocks are flexible, with manyparameters set by either the application de-signer or through optimization scripts.Thus, when application designers port theirapplications to this hardware base, they cancustomize the software and hardware simul-taneously. In addition, the template containshighly parameterized modules to enable per-vasive hardware customization. The applica-tion developer tunes the parameters to meeta desired specification. Then, this informa-tion is compiled, and optimization proce-dures are deployed to produce the finalchip. The end result of this process is achip with customized functional units andmemories that increase computing efficiency.
 
 
 
