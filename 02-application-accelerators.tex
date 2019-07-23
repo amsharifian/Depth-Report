@@ -141,7 +141,7 @@ Bluespec SystemVerilog~\cite{bluespec}
 
 One exception to this is Bluespec SystemVerilog \cite{bluespec}, which supports state machine inference from nested while loops.
 Recent advancements in HDLs have largely been aimed at meta-programming improvements and increasing the size of hardware module libraries.
-Languages like Chisel~\cite{chisel}, MyHDL~\cite{myhdl} and VeriScala~\cite{veriscala} make procedural generation of circuits simpler by embedding their HDL in a software language (e.g. Scala or Python). Similarly, Genesis2~\cite{genesis2} adds Perl scripting support to SystemVerilog to help drive procedural generation. While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
+Languages like Chisel~\cite{chisel}, MyHDL~\cite{decaluwe_2004_myhdl} and VeriScala~\cite{veriscala} make procedural generation of circuits simpler by embedding their HDL in a software language (e.g. Scala or Python). Similarly, Genesis2~\cite{genesis2} adds Perl scripting support to SystemVerilog to help drive procedural generation. While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
 %For application accelerators, such a low level of abstraction is often too tedious.
 
 
@@ -167,7 +167,7 @@ Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 
 
 \subsection{Chisel/ MyHDL/ VeriScala / PyMTL}
-Chisel~\cite{bachrach_dac_2012_chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
+Chisel~\cite{chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
 % * Embed HDL in software languages like Scala or Python
 % * Adding support for meta-programming 
 % * Improve modular hardware library design
@@ -225,7 +225,7 @@ natural way to express a high-level DSP algorithm. Furthermore, in general it is
 if the goal is a programmable engine to run many applications, where the human designer would prefer to write a
 
 \subsection{Firrtl}
-Firrtl~\cite{izraelevitz_2017_firrtl_reusability, li_2016_firrtl_specification}
+Firrtl~\cite{izraelevitz_2017_firrtl_reusability, firrtl}
 % * Compiler
 
 
