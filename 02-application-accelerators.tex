@@ -72,80 +72,71 @@ They can result in ambiguities that make automated synthesis and verification im
 For any design in order to achieve maximum generality, they require users to explicitly manage timing, control signals, and local memories.
 
 A big limitation of HDL languages is that these languages lack the powerful abstraction facilities that
-are common in modern software languages, which leads to low designer productivity by making it difficult to reuse components.
+are common in modern software languages, which leads to low designer productivity by making it difficult to reuse components~\cite{shacham_rethinking_2010}.
 Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures but traditional HLDs have limited module generation facilities and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
 Recent extensions such as SystemVerilog improve the type system and parameterized generate facilities but still lack many powerful programming language features.
 But why reusing components is important?
 The key benefit of reusing hardware components is that every time a chip is built, we inherently evaluate different design decisions, either implicitly using microarchitectural and domain knowledge, or explicitly through custom evaluation tools.
-Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip. Tensilica applied the same idea to create customized processors~\cite{tensillica}.
+Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip. Tensilica applied the same idea to create customized processors~\cite{tensillica}~\cite{tensillica}.
 
-% Genesis2~\cite{genesis2} was one of the first attempts to work around these limitations. Genesis2 uses Perl language as a macro processing language to provide more flexible parameterization and elaboration of underlying hardware blocks in SystemVerilog. Listing~\ref{listing:genesis2} shows an example of \textit{Genesis2's code}.
+Genesis2~\cite{genesis2} was one of the first attempts to work around these limitations. Genesis2 uses Perl language as a macro processing language to provide more flexible parameterization and elaboration of underlying hardware blocks in SystemVerilog. Listing~\ref{listing:genesis2} shows an example of \textit{Genesis2's code}.
 
-% \begin{listing}[ht]
-%     \begin{minted}{python}
-%     import numpy as np
-        
-%     def incmatrix(genl1,genl2):
-%         m = len(genl1)
-%         n = len(genl2)
-%         M = None #to become the incidence matrix
-%         VT = np.zeros((n*m,1), int)  #dummy variable
-        
-%         #compute the bitwise xor matrix
-%         M1 = bitxormatrix(genl1)
-%         M2 = np.triu(bitxormatrix(genl2),1) 
-    
-%         for i in range(m-1):
-%             for j in range(i+1, m):
-%                 [r,c] = np.where(M2 == M1[i,j])
-%                 for k in range(len(r)):
-%                     VT[(i)*n + r[k]] = 1;
-%                     VT[(i)*n + c[k]] = 1;
-%                     VT[(j)*n + r[k]] = 1;
-%                     VT[(j)*n + c[k]] = 1;
-                    
-%                     if M is None:
-%                         M = np.copy(VT)
-%                     else:
-%                         M = np.concatenate((M, VT), 1)
-                    
-%                     VT = np.zeros((n*m,1), int)
-        
-%         return M
-%     \end{minted}
-%     \caption{Minimal working example}
-%     \label{listing:genesis2}
-% \end{listing}
+\begin{listing}[ht]
+    \begin{minted}{Verilog}
+        //; # More Perl Libraries
+        //; use POSIX (ceil);
+        //; my $reg_list = $self->define_param(REG_LIST => 
+        //; [	
+        //;     {name => 'regA', width => 5, default => 17, IEO => 'ie'},
+        //;     {name => 'regB', width => 10, default => 27, IEO => 'o'},
+        //;     {name => 'regC', width => 15, IEO => 'ieo'},
+        //;     {name => 'regD', width => 31, IEO => 'ieo'},
+        //;     {name => 'regE', width => 32, IEO => 'ieo'},
+        //; ]);
+        //; my $num_regs = scalar(@{$reg_list});
+        //; my $num_addr_bits = ceil(log($num_regs)/log(2));
 
+        // Verilog code for the module
+        module 'mname()' (
+            input                               Clk,
+            input                               Reset,
+            input ['$num_addr_bits-1':0]        Addr,
+            ...
+            );
 
-% Therefore, we propose rethinking how weapproach design. The key is realizing that, al-though we can’t afford to build a customizedchip for every application, we can reuse oneapplication’s design process to generate mul-tiple new chips.
-% Although this process could help create other, similar chips,today we settle on a particular target imple-mentation and record our solution. Ourapproach embeds this implicit and explicitknowledge in the modules we construct, en-abling us to customize the system for differ-ent goals or constraints, and thus to createdifferent chip instances.
-% specialized chip, similar to the way Tensili-ca’s tools create customized processors(http://www.tensilica.com).
-% Creating flexible, domain-specific chipgenerators rather than single chip instanceslets us preserve and enhance knowledgefrom past designs. We can then use thatknowledge to produce new customized solu-tions by capturing, not only the final design,but also the tools and trade-off analysis thatled to this design. In this approach, thechip generator uses a fixed system architec-ture (ortemplate)tomakebothsoftwarede-velopment and verification simpler, but itsinternal blocks are flexible, with manyparameters set by either the application de-signer or through optimization scripts.Thus, when application designers port theirapplications to this hardware base, they cancustomize the software and hardware simul-taneously. In addition, the template containshighly parameterized modules to enable per-vasive hardware customization. The applica-tion developer tunes the parameters to meeta desired specification. Then, this informa-tion is compiled, and optimization proce-dures are deployed to produce the finalchip. The end result of this process is achip with customized functional units andmemories that increase computing efficiency.
+        endmodule // 'mname()'
+    \end{minted}
+    \caption[Caption for LOF]%
+    {Genesis2 code example, combining SystemVerilog and Perl~\cite{genesis2}}
+    \label{listing:genesis2}
+\end{listing}
 
+In this example, perl is using ceil libarary from POSIX library to set the values for $\$num\_add\_bits$.
 
+These approaches allow familiar and powerful languages like Verilog to be macro languages for hardware netlists, but effectively require leaf components of the design to be described in the underlying HDL.
+This combined approach is cumbersome, combining the poor abstraction facilities of the underlying HDL with a completely different high-level programming model that does not understand hardware types and semantics.
 
-Hardware Generation Languages – Hardware generation languages (HGLs) are hardware design languages that
-enable the construction of highly-parameterizable hardware
-templates [40]. HGLs facilitate design space exploration at
-the register-transfer level, and some HGLs additionally improve the productivity of RTL design through the introduction of higher-level design abstractions. Examples of HGLs
-include Genesis II [41], Chisel [2], and Bluespec [26]
-
-%
-\subsection{Bluespec SystemVerilog}
-Bluespec SystemVerilog~\cite{bluespec}
-% * Loops are expressed by state machines
-% * state machine inference from nested while loops
-% 
+Another alternative proposal to improve productivity of HLD languages was beginning from a domain-specific application programming language and then generate hardware blocks. 
+Bluespec~\cite{bluespec} is an example of such languages.
+Bluespec Compiler (BSC) is a tool that uses BluespecSystem  Verilog  (BSV)  as  the  design  language.
+BSV is a high-level functional HDL based on Verilog and inspired by Haskell, where  modules are implemented as a set of rules using  Verilog  syntax.
+The rules are called guarded atomic actions and express behavior in the form of concurrently cooperating finite state machines (FSMs).
+Rules are predicated witha condition. They give the impression of freezing the rest of the system when a given rule's action is carried out after the rule's predicate is true.
+There is an implicit parallelism in this specification, because it is possible for multiple rules to be activated and executed in parallel.
+The compiler automatically schedules the rules such that they are either conflict-free or combined sequentially to preserve the promised atomicity semantic.
 
 
-One exception to this is Bluespec SystemVerilog \cite{bluespec}, which supports state machine inference from nested while loops.
-Recent advancements in HDLs have largely been aimed at meta-programming improvements and increasing the size of hardware module libraries.
-Languages like Chisel~\cite{chisel}, MyHDL~\cite{decaluwe_2004_myhdl} and VeriScala~\cite{veriscala} make procedural generation of circuits simpler by embedding their HDL in a software language (e.g. Scala or Python). Similarly, Genesis2~\cite{genesis2} adds Perl scripting support to SystemVerilog to help drive procedural generation. While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
+% One exception to this is Bluespec SystemVerilog \cite{bluespec}, which supports state machine inference from nested while loops.
+% Recent advancements in HDLs have largely been aimed at meta-programming improvements and increasing the size of hardware module libraries.
+% Languages like Chisel~\cite{chisel}, MyHDL~\cite{decaluwe_2004_myhdl} and VeriScala~\cite{veriscala} make procedural generation of circuits simpler by embedding their HDL in a software language (e.g. Scala or Python). Similarly, Genesis2~\cite{genesis2} adds Perl scripting support to SystemVerilog to help drive procedural generation. While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
 %For application accelerators, such a low level of abstraction is often too tedious.
 
 
-
+\subsection{Chisel}
+Chisel~\cite{chisel}
+% * Adding support for meta-programming 
+% * Improve modular hardware library design
+%
 
 
 
@@ -162,16 +153,8 @@ Memory accesses are inferred, and processors provide implicit support for interf
 
 
 
-\subsection{Spatial}
-Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 
 
-\subsection{Chisel/ MyHDL/ VeriScala / PyMTL}
-Chisel~\cite{chisel}/ MyHDL~\cite{decaluwe_2004_myhdl}/ VeriScala~\cite{liu_2017_scala} / PyMTL~\cite{lockhart_ISCA_2014_pymtl}
-% * Embed HDL in software languages like Scala or Python
-% * Adding support for meta-programming 
-% * Improve modular hardware library design
-%
 
 The dominant traditional hardware-description languages
 (HDLs), Verilog and VHDL, were originally developed as
@@ -229,9 +212,12 @@ Firrtl~\cite{izraelevitz_2017_firrtl_reusability, firrtl}
 % * Compiler
 
 
+\subsection{Spatial}
+Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 
 
-\subsection{Abstraction Levels}
+
+\section{Abstraction Levels}
 
 One of the commonly-accepted solutions for closing the productivity gap as
 proposed by semiconductor roadmaps is to raise the level of abstraction in the design process. In order to achieve the acceptable productivity gains
