@@ -7,6 +7,7 @@
 %   * Alternative is FPGA/CGRA
 %   * There are challenges with programming FPGA/CGRA
 %   * HLS is one solution
+
 %
 
 \section{Why application specific accelerators?}
@@ -52,8 +53,144 @@ and the chips we can design.
     \label{fig:productivity}
 \end{figure}
 
+One of the commonly-accepted solutions for closing the productivity gap as proposed by semiconductor roadmaps is to \emph{raise the level of abstraction in the design process.}
+In order to achieve the acceptable productivity gains and to bridge the semantic gap between higher abstraction levels and low-level implementations, the goal now is to \emph{automate} the system-design process as much as possible.
+However, to make automation possible we need to have: 1)A well-defined system abstraction level, well-known components of particular abstraction level and having a clear semantics for system-design languages.
+The code, however, can be generated in a specific target language such as C>
+In order to understand system-level possibilities more fully, we first explain the different abstraction levels involved in system design.
 
-Before talking about the possible solutions for feeling the productivity gap, we elaborate more on why the current status of designing hardware makes design productivity low. And then we look at the solutions to improve the productivity of system design by introducing new languages that gives designer more powerful features to design their hardware without rising level of abstractions.
+\section{Abstraction Levels}
+
+The growing capabilities of silicon technology over the previous decades has forced design methodologies and tools to move to higher levels of abstraction
+In order to explain the relationship between different design methodologies on
+different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model} to explain differences between different design tools and different design methodologies in which these tools were used.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/Introduction/Y-Chart.pdf}
+    \caption{Y-Chart}
+    \label{fig:y-chart}
+\end{figure}
+
+Y-Chart divides design representation into three domains:1)Behavioral, it can also called functionality and specification, 2)Structural, also called netlist or a block diagram and 3)Physical, usually called layout or board design. Behavior represents a design as a black-box but it describes the output base on inputs over time. What behavior representation doesn't specify is how the black-box is structured or how to build the black-box. This is the task of structural representation. In this specification, black-box is represented as a set of components and connections. While, it's possible to drive the behavior of black-box from its components and its connections but understanding the behavior can be very difficult since it is obscured by the details of each component and connection.
+Eventually, physical design describe different dimension of each component.
+
+The Y-chart also defines multiple level of abstractions for a design by drawing concentric circles on the Y. Typically, four levels are used: system, processor, logic and circuit levels.
+The name of each abstraction level is derived from the types of the components generated on that abstraction level.
+For instance, on the processor level, we generate standard and custom processors, or special-hardware components such as memory controllers, arbiters, brides and various interface components. At the higher level, system level, we design standard or embedded systems consisting of processors, memories, buses, and other processor components.
+
+Let's look at binary counter as an example. In this example at the algorithmic-level, we only know that at every cycle the input value will be increased by one and the output in the next cycle would be the input plus one.
+At the next lower level, we understand that to carry out this function some sort of register is needed to hold the value of the counter.
+We can state this idea using a register transfer statement such as $AC \leftarrow AC + 1$.
+On the structural side, the register consists of gates and flip-flops, which themselves consist of transistors.
+
+On each abstraction level, we need a library of components to be used in building \emph{the structure} for a given \emph{behavior}.
+This process of converting the given behavior into a structure for a given haviour is called \textbf{synthesis}.
+Once a structure is defined and verified, we can proceed to the next lower abstraction level by further synthesizing each of the components in the structure.
+On the other hand, if each component in the library is given with its structure and
+the physical implementation, we can proceed with physical design.
+Thus each component in the library may have up to three different models representing
+three different axes in the Y-Chart: behavior or function; structure, which
+contains the components from the lower level of abstraction; and the physical.
+
+In the rest of this chapter we focus on the first two level of abstractions, \textit{Processr} and \textit{System}.
+Fortunately, all three models for each component are not typically needed most of the time.
+Most of the methodologies presently in use perform design or synthesis on the system and processor levels, where every system component except standard processors and memories is synthesized to the logic level, before the physical design is performed on the logic level.
+Therefore, for the top three abstraction levels, we only need a functional model of each component with estimates of the key metrics such as performance, delay, power, cost, size, reliability, testability, etc.
+Once the design is represented in terms of logic gates and flip-flops, we can use standard cells for each logic component and perform layout placement and routing.
+On the other hand, some components on the processor-and-system levels may be obtained as IPs and not synthesized.
+Therefore, their structure and physical design are known, at least partially, on the level higher than logic level.
+In that case, the physical design then may contain components of different sizes and from different levels of abstraction.
+
+We first explain behavioral model and structural model of each level of abstraction. And then we explain the procedure or moving from behavioral domain to procedural domain.
+
+
+\section{Processor-Level Behavioral Model}
+\label{sec:processor_level_behavioral_model}
+
+On the processor level, we define and design computational components or processing elements (PEs).
+Each PE can be a dedicated or custom component that computes some specific functions, or it can be a general or standard PE that can compute any function specified in some standard programming language.
+The functionality or behavior of each PE can be specified in several different ways.
+
+In the basic implementation of PEs, their functionality can be specified with mathematical expressions or formulas.
+But there is no limitation on what the functionaly of a PE can be.
+Therefore, we can expand the functionality of a PE and specify it with an algorithm in some \textit{programming language}.
+If we want to go beyond a mathematical expression, we solution is to use Finite State Machines (FSMs).
+A FSM is defined with a set of states and a set of transitions from state to state, which are taken when some input variables reach the required value. Furthermore, each FSM generates some val- ues for output variables in each state or during each transition. A FSM model can be made clock-accurate if each state is considered to take one clock cycle. In general, a FSM model is useful for computations requiring several hundred states at most.
+
+This FSM model use standard integer or floating-point variables and computing their values in each state or during each transition by a set of arithmetic expressions or programming statements.
+For example, Figure~\ref{fig:fsm_model} shows a FSM with three states, S1, S2, and S3, and with arcs representing state changes under different inputs.
+Each state executes a computation represented by one or more arithmetic expressions or programming statements.
+For example, in state S1, the FSM in Figure~\ref{fig:fsm_model} computes two functions, x = |a| and y = |b|, and in state S3 it computes the function z = max (x, y).
+A FSM model is usually not clock-accurate since computation in each state may take more than one clock cycle.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.4\textwidth]{figures/Introduction/FSM.pdf}
+    \caption{FSM model}
+    \label{fig:fsm_model}
+\end{figure}
+
+
+
+
+
+\section{Missing Semantics}
+\label{sec:missing_semantics}
+
+As an example of this problem, we can look in ~\ref{fig:missing_semantics} at a simple case statement available in any hardware or system modeling language.
+This type of case statement can be used to model a FSM in which every case such as X1,X2, ..., represents a state in which all its next states are de ned.
+This type of case statement can also be used to model a look-up table, in which every case X1, X2, ..., indicates a location in the memory that contains a value in the table.
+Therefore,  we can use the same case statement with the same variables  and format to describe two completely different components.
+Unfortunately, FSMs and look-up tables require completely different implementations:  a FSM can be implemented with a controller or with logic gates, while a look-up table is usually implemented with some kind of memory.
+It is also possible to implement a FSM with a memory or a table using logic gates.
+However, this would not bea very ef cient implementation, and it would not be acceptable to any designer.
+So a model which uses case statements to model FSMs and tables is good for simulation but not for implementation because neither a designer nor a synthesis tool can determine which type of structure was described by the case statement.
+The lesson is that contemporary modeling languages allow modelers to de-scribe the design in many different ways and to use the same description for different designs details. But for automatic refinement, synthesis, and veri cation, we need clean and unambiguous semantic which uniquely represents all the system concepts in a given model.  Such a clean semantic is missing from most of the simulation-oriented  languages.
+In order to have well defined semantics, we need to introduce some form of formalism to models and modeling languages.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\textwidth]{figures/Introduction/Missing_Semantics.pdf}
+    \caption{Missing Semantics}
+    \label{fig:missing_semantics}
+\end{figure}
+
+
+
+
+% \subsection{Hardware Design Methodologies}
+
+% The first two clear advantages of automation of design process is first, it assures a much shorter design cycle, second, it allows for more exploration of different design style since different designs can be generated and evaluated quickly.
+% And the ultimate goal of automation process is to out-perform average human designers in generating high quality designs. Another main advantages of synthesis is to capture the designer knowledge so that the process of making follow-on chip(s) is much easier and automated although human quality can be achieved on a single task.
+
+% Currently, there are two schools of toughs to design a hardware. The first school is capture-and-simulation school believes that human designers have very good design knowledge accumulated through experience that \emph{cannot be automated}. In this case, programming FPGAs involves using a combination of vendor-supplied IP blocks, hand tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM.
+
+% The second school believes to describe the design and high level and synthesis from description. This school believes that a top-down methodology, in which designers describe the intent of the design and automation tool's add detailed structure, would be better suited for the complex designs. This approach focuses on definition of description languages, design models and synthesis algorithms. In this model, designers' intuition can substantially reduce the search through the design space.
+
+
+% We define design synthesis, broadly speaking, as a translation process from a behavioral description into a structural description.
+
+
+% \paragraph{Describing Y-Chart here to clarify both thoughts}
+
+% \section{Languages, Design and Technologies}
+% Synthesis systems must allow for making design tradeoffs using different design styles for different technologies and design goals.
+
+% Some design methodologies like pipelining can be abstracted into language constructs to provide better understanding and simpler synthesis algorithms.
+
+% Unfortunately, each design can be described or modeled using a single language in several different ways.A
+
+% Similarly, a design implementation is not unique.For each function in the design, there are several design styles suitable for different design goals or constraints.
+
+% HLS still lacks a formalism of the type already developed for layout and logic synthesis. HLS uses formalisms based on several different areas, varying from the programming-language paradigm for the behavioral description to layout models for cost and performance estimation.
+
+
+% The main problem with a design description is its change with the design over time. At the beginning, the description is vague, with little or no implementation detail. More detail is added as the design evolves, and the level of abstraction is lowered until the design is ready for manufacturing. A language that spans all the levels of abstraction would be desirable from a management point of view but would be too cumbersome to be mastered by designers, who work only on one or two levels of abstractions.
+
+% Furthermore, different members of the design team require different aspects of a design, for reasons of verifiability, testability, reliability, information needed by those experts to one language known to everybody would produce a very rich language in which information for any particular aspect of the design would be difficult to find.
+
 
 
 \section{Hardware definition languages}
@@ -216,99 +353,5 @@ Firrtl~\cite{izraelevitz_2017_firrtl_reusability, firrtl}
 Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 
 
-
-\section{Abstraction Levels}
-
-One of the commonly-accepted solutions for closing the productivity gap as
-proposed by semiconductor roadmaps is to raise the level of abstraction in the design process. In order to achieve the acceptable productivity gains
-and to bridge the semantic gap between higher abstraction levels and low-level
-implementations, the goal now is to automate the system-design process as
-much as possible. 
-However, to make automation possible we need to have: 1)A well-defined system abstraction level, well-known components of particular abstraction level and having a clear semantics for system-design languages.
-In the following chapters, we will discuss how to answer for those challenges.
-
-In order to explain the relationship between different design methodologies on
-different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model} to explain differences between different design tools and different design methodologies in which these tools were used.
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.5\textwidth]{figures/Introduction/Y-Chart.pdf}
-    \caption{Y-Chart}
-    \label{fig:y-chart}
-\end{figure}
-
-Y-Chart divides design representation into three domains:1)Behavioral, it can also called functionality and specification, 2)Structural, also called netlist or a block diagram and 3)Physical, usually called layout or board design. Behavior represents a design as a black-box but it describes the output base on inputs over time. What behavior representation doesn't specify is how the black-box is structured or how to build the black-box. This is the task of structural representation. In this specification, black-box is represented as a set of components and connections. While, it's possible to drive the behavior of black-box from its components and its connections but understanding the behavior can be very difficult since it is obscured by the details of each component and connection.
-Eventually, physical design describe different dimension of each component.
-
-The Y-chart also defines multiple level of abstractions for a design by drawing concentric circles on the Y. Typically, four levels are used: system, processor, logic and circuit levels.
-The name of each abstraction level is derived from the types of the components generated on that abstraction level.
-For instance, on the processor level, we generate standard and custom processors, or special-hardware components such as memory controllers, arbiters, brides and various interface components. At the higher level, system level, we design standard or embedded systems consisting of processors, memories, buses, and other processor components.
-
-Let's look at binary counter as an example. In this example at the algorithmic-level, we only know that at every cycle the input value will be increased by one and the output in the next cycle would be the input plus one.
-At the next lower level, we understand that to carry out this function some sort of register is needed to hold the value of the counter.
-We can state this idea using a register transfer statement such as $AC \leftarrow AC + 1$.
-On the structural side, the register consists of gates and flip-flops, which themselves consist of transistors.
-
-\paragraph{Synthesis:}On each abstraction level, we need a library of components to be used in building \emph{the structure} for a given \emph{behavior}.
-This process of converting the given behavior into a structure for a given haviour is called \emph{synthesis}.
-On the other hand, if each component in the library is given with its structure and
-the physical implementation, we can proceed with physical design.
-Thus each component in the library may have up to three different models representing
-three different axes in the Y-Chart: behavior or function; structure, which
-contains the components from the lower level of abstraction; and the physical.
-
-
-% \subsection{Hardware Design Methodologies}
-
-% The first two clear advantages of automation of design process is first, it assures a much shorter design cycle, second, it allows for more exploration of different design style since different designs can be generated and evaluated quickly.
-% And the ultimate goal of automation process is to out-perform average human designers in generating high quality designs. Another main advantages of synthesis is to capture the designer knowledge so that the process of making follow-on chip(s) is much easier and automated although human quality can be achieved on a single task.
-
-% Currently, there are two schools of toughs to design a hardware. The first school is capture-and-simulation school believes that human designers have very good design knowledge accumulated through experience that \emph{cannot be automated}. In this case, programming FPGAs involves using a combination of vendor-supplied IP blocks, hand tuned hardware modules written using either low-level RTL or high-level synthesis tools, and architecture-specific glue logic to communicate with off-chip components such as DRAM.
-
-% The second school believes to describe the design and high level and synthesis from description. This school believes that a top-down methodology, in which designers describe the intent of the design and automation tool's add detailed structure, would be better suited for the complex designs. This approach focuses on definition of description languages, design models and synthesis algorithms. In this model, designers' intuition can substantially reduce the search through the design space.
-
-
-% We define design synthesis, broadly speaking, as a translation process from a behavioral description into a structural description.
-
-
-% \paragraph{Describing Y-Chart here to clarify both thoughts}
-
-% \section{Languages, Design and Technologies}
-% Synthesis systems must allow for making design tradeoffs using different design styles for different technologies and design goals.
-
-% Some design methodologies like pipelining can be abstracted into language constructs to provide better understanding and simpler synthesis algorithms.
-
-% Unfortunately, each design can be described or modeled using a single language in several different ways.A
-
-% Similarly, a design implementation is not unique.For each function in the design, there are several design styles suitable for different design goals or constraints.
-
-% HLS still lacks a formalism of the type already developed for layout and logic synthesis. HLS uses formalisms based on several different areas, varying from the programming-language paradigm for the behavioral description to layout models for cost and performance estimation.
-
-
-% The main problem with a design description is its change with the design over time. At the beginning, the description is vague, with little or no implementation detail. More detail is added as the design evolves, and the level of abstraction is lowered until the design is ready for manufacturing. A language that spans all the levels of abstraction would be desirable from a management point of view but would be too cumbersome to be mastered by designers, who work only on one or two levels of abstractions.
-
-% Furthermore, different members of the design team require different aspects of a design, for reasons of verifiability, testability, reliability, information needed by those experts to one language known to everybody would produce a very rich language in which information for any particular aspect of the design would be difficult to find.
-
-
-\section{Missing Semantics}
-
-As an example of this problem, we can look in ~\ref{fig:missing_semantics} at a simple case statement available in any hardware or system modeling language.
-This type of case statement can be used to model a FSM in which every case such as X1,X2, ..., represents a state in which all its next states are de ned.
-This type of case statement can also be used to model a look-up table, in which every case X1, X2, ..., indicates a location in the memory that contains a value in the table.
-Therefore,  we can use the same case statement with the same variables  and format to describe two completely different components.
-Unfortunately, FSMs and look-up tables require completely different implementations:  a FSM can be implemented with a controller or with logic gates, while a look-up table is usually implemented with some kind of memory.
-It is also possible to implement a FSM with a memory or a table using logic gates.
-However, this would not bea very ef cient implementation, and it would not be acceptable to any designer.
-So a model which uses case statements to model FSMs and tables is good for simulation but not for implementation because neither a designer nor a synthesis tool can determine which type of structure was described by the case statement.
-The lesson is that contemporary modeling languages allow modelers to de-scribe the design in many different ways and to use the same description for different designs details. But for automatic refinement, synthesis, and veri cation, we need clean and unambiguous semantic which uniquely represents all the system concepts in a given model.  Such a clean semantic is missing from most of the simulation-oriented  languages.
-In order to have well defined semantics, we need to introduce some form of formalism to models and modeling languages.
-
-
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.7\textwidth]{figures/Introduction/Missing_Semantics.pdf}
-    \caption{Missing Semantics}
-    \label{fig:missing_semantics}
-\end{figure}
 
 
