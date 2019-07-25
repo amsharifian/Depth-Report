@@ -121,8 +121,9 @@ A FSM is defined with a set of states and a set of transitions from state to sta
 This FSM model use standard integer or floating-point variables and computing their values in each state or during each transition by a set of arithmetic expressions or programming statements.
 For example, Figure~\ref{fig:fsm_model} shows a FSM with three states, S1, S2, and S3, and with arcs representing state changes under different inputs.
 Each state executes a computation represented by one or more arithmetic expressions or programming statements.
-For example, in state S1, the FSM in Figure~\ref{fig:fsm_model} computes two functions, x = |a| and y = |b|, and in state S3 it computes the function z = max (x, y).
+For example, in state S1, the FSM in Figure~\ref{fig:fsm_model} computes two functions, $x = |a|$ and $y = |b|$, and in state S3 it computes the function $z = max (x, y)$.
 A FSM model is usually not clock-accurate since computation in each state may take more than one clock cycle.
+Therefore, using FSM model to represent computation expressed by programming languages like C is not adequet.
 
 \begin{figure}[h]
     \centering
@@ -132,16 +133,74 @@ A FSM model is usually not clock-accurate since computation in each state may ta
 \end{figure}
 
 
+In general, programming languages consist of \code{if} statements, loops, and expressions.
+An \code{if} statement has two parts, then and else, in which then is executed \code{if} the conditional expression given in the \code{if} statement is true, otherwise the else part is executed.
+In each of the then or else parts, the \code{if} statement computes \emph{a set of expressions called a Basic Block (BB)}.
+The \code{if} statement can also be used in the loop construct to represent loop iterations, which are executed as long as the condition in the \code{if} statement is true.
+Therefore, any programming-language code can be represented by a Control-Data Flow Graph (CDFG) consisting of \code{if} diamonds, which represent \code{if} conditions, and BB blocks, which represent computation [151].
+Figure~\ref{fig:dcfg_model} shows such a CDFG, this one representing a loop with an \code{if} statement inside the loop iteration.
+In each iteration, the loop construct executes BB1 and BB2 or BB3 depending on the value of \code{if} statement.
+At the end, the loop is exited if all all iterations are executed.
+
+A CDFG shows explicitly the control dependencies between loop statements, if statements, and BBs, as well as the data dependences among operations inside a BB.
+It can be converted to a FSM by assigning a state to each BB and one state for the computation of each if conditional.
+Note that each state in such a FSM may need several clock cycles to execute its assigned BB or if condition.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.55\textwidth]{figures/Introduction/CFG.pdf}
+    \caption{FSM model}
+    \label{fig:dcfg_model}
+\end{figure}
+
+\section{Processor-Level Structural Model}
+
+A processor’s behavioral model, whether defined by a program in C, CDFG, FSM, or by an IS, can be implemented with a set of register-transfer components; such a structural model usually consists of a controller and a datapath like general purpose processors.
+A datapath consists of a set of storage elements (such as registers, register files, and memories), a set of functional units (such as ALUs, multipliers, shifters, and other custom functional units), and a set of busses.
+All of these register-transfer components may be allocated in different quantities and types and connected arbitrarily through busses or a network-on-chip (NOC).
+Each component may take one or more clock cycles to execute, each component may be pipelined, and each component may have input or output latches or registers.
+In addition, the entire datapath can be pipelined in several stages in addition to components being pipelined by themselves.
+The choice of components and datapath structure depends on the metrics to be optimized for particular implementation.
+
+The controller defines the state of the processor clock cycle per clock cycle and issues the control signals for the datapath accordingly.
+The structure of the controller and its implementation depends on whether the processor is a standard processor (such as Xeon, ARM, or a DSP) or a custom-design processor or Intellectual Property (IP) function specifically synthesized for a particular application and platform.
+For instance, in the case of a standard processor, the controller is programmable with a program counter (PC), and an address generator (AG) that defines the next address to be loaded into the PC.
+In the case of specific custom processors, the controller can be implemented with programmability concepts typical of standard processors, and control signal generation of IP implementations like CGRAs.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.6\textwidth]{figures/Introduction/Processor_Structure.pdf}
+    \caption{Processor structure model}
+    \label{fig:proc_synthesis}
+\end{figure}
 
 
 
-\section{Missing Semantics}
+\section{Processor-Level Synthesis}
+
+Synthesis of standard processors starts with the instruction set (IS) of the processor.
+In order to achieve the highest processor performance this process is done manually since standard processors try to achieve the highest performance and minimal power consumption at minimal cost.
+The second reason for synthesizing processors manually is to minimize the design size and therefore fabrication cost for high-volume production.
+In contrast, the design or synthesis of a custom processor or a custom IP starts with the C code of an algorithm, which is usually converted to the corresponding CDFG or FSMD model be- fore synthesis and ends up with a custom processor containing the number and type of components connected as required by the given behavioral model.
+This generation is usually called high-level synthesis or register-transfer synthesis or occasionally just processor synthesis.
+Selecting components and the structure of a PE and defining register-transfer operations performed in each clock cycle is the task of processor-level synthesis.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\textwidth]{figures/Introduction/processor-synthesis.pdf}
+    \caption{High-Level Synthesis (HLS)}
+    \label{fig:proc_synthesis}
+\end{figure}
+
+
+
+\subsection{Missing Semantics}
 \label{sec:missing_semantics}
 
 As an example of this problem, we can look in ~\ref{fig:missing_semantics} at a simple case statement available in any hardware or system modeling language.
 This type of case statement can be used to model a FSM in which every case such as X1,X2, ..., represents a state in which all its next states are de ned.
 This type of case statement can also be used to model a look-up table, in which every case X1, X2, ..., indicates a location in the memory that contains a value in the table.
-Therefore,  we can use the same case statement with the same variables  and format to describe two completely different components.
+Therefore,  we can use the same case statement with the same variables and format to describe two completely different components.
 Unfortunately, FSMs and look-up tables require completely different implementations:  a FSM can be implemented with a controller or with logic gates, while a look-up table is usually implemented with some kind of memory.
 It is also possible to implement a FSM with a memory or a table using logic gates.
 However, this would not bea very ef cient implementation, and it would not be acceptable to any designer.
@@ -160,7 +219,14 @@ In order to have well defined semantics, we need to introduce some form of forma
 
 
 
-% \subsection{Hardware Design Methodologies}
+\section{Hardware Design Methodologies}
+
+\paragraph{Method1:} Describe-and-Synthesize methodology (late 1980s to late 1990s). The 1980s brought us tools for logic synthesis which have significantly altered design flow, since the behavior and structure of a design were both captured on the logic level. Designers specified first what they wanted in Boolean equations or FSM descriptions, and then the synthesis tools generated the implementation in terms of a logic-level netlists. In this methodology therefore, the behavior or function comes first, and the structure or implementation comes afterwards. Moreover, both of these descriptions are simulatable, which is an marked improvement over Capture-and-Simulate methodology, because it permits much more efficient verification; it makes it possible to verify the descriptions’ equivalence since both descriptions can in principle be reduced to a canonical form. However, today’s designs are too large for this kind of equivalence checking.
+By the late 1990s, the logic level had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis. Therefore, we now have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural). However, the system gap still persists because there was not relation between RTL and higher system level.
+
+\paragraph{Mode2:} By the late 1990s, the logic level had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis. Therefore, we now have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural). However, the system gap still persists because there was not relation between RTL and higher system level.
+
+Specify, Explore-and-Refine methodology (early 2000s to present). In order to close this gap, we must increase the level of abstraction from the RTL to the system level (SL) and to introduce a methodology that includes both SW and HW. On the SL, we can start with an executable specification that represents the system behavior; we can then extend the system-level methodology to include several models with different details that correspond to different design decisions. Each model is used to prove some system property: functionality, application algorithms, connectivity, communication, synchronization, coherence, routing, performance, or some design metric such as performance, power, and so on. So we must deal with several models in order to verify the impact of design decisions on every metric starting from an executable specification down to the RTL and further to the physical design. We can consider each model as a specification for the next level model, in which more implementation detail is added after more design decisions are made. We can label this a Specify-Explore-Refine (SER) methodology [63, 100], in that it consists of a sequence of models in which each model is a refinement of the previous. Thus SER methodology follows the natural design process in which de- signers specify the intent first, then explore possibilities, and finally refine the model according to their decisions. SER flow can therefore be viewed as several iterations of the basic Describe-and-Synthesize methodology.
 
 % The first two clear advantages of automation of design process is first, it assures a much shorter design cycle, second, it allows for more exploration of different design style since different designs can be generated and evaluated quickly.
 % And the ultimate goal of automation process is to out-perform average human designers in generating high quality designs. Another main advantages of synthesis is to capture the designer knowledge so that the process of making follow-on chip(s) is much easier and automated although human quality can be achieved on a single task.
@@ -193,7 +259,7 @@ In order to have well defined semantics, we need to introduce some form of forma
 
 
 
-\section{Hardware definition languages}
+\subsection{Hardware definition languages}
 
 Hardware description languages like Verilog and VHDL are designed for arbitrary circuit description.
 Initially, these languages are developed as hardware simulation languages, and were only later adopted as a basis for hardware design.
@@ -349,7 +415,7 @@ Firrtl~\cite{izraelevitz_2017_firrtl_reusability, firrtl}
 % * Compiler
 
 
-\subsection{Spatial}
+\section{Spatial}
 Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 
 
