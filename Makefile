@@ -8,7 +8,7 @@ FIGS = $(wildcard figures/*.pdf figures/*.png graphs/*.pdf graphs/*.png)
 
 $(PAPER).pdf: $(TEX) $(BIB) $(FIGS) 
 	echo $(FIGS)
-	pdflatex --synctex=1  -shell-escape $(PAPER) 
+	pdflatex --synctex=1 -shell-escape $(PAPER) 
 	bibtex $(PAPER)
 	pdflatex -shell-escape $(PAPER) 
 	pdflatex -synctex=1 -shell-escape $(PAPER) 
