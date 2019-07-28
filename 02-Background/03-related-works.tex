@@ -1,4 +1,4 @@
-%!TEX root = main.tex
+%!TEX root = ../main.tex
 
 % Notes 
 
@@ -135,13 +135,28 @@ In fact, FIRTTL as the hos language, Chisel, to be used for mostly its met-progr
 While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall system design productivity.
 
 \section{Spatial}
-Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
+% * Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 % * A practice to improve chisel flexibility
 % * Higher level of abstraction to chisel
 % * Untimed modules
 % * Reduction to parallel patterns
+Recently, Spatial~\cite{david_PLDI_2018_spatial} is been proposed as a language and compiler for applications specific accelerators.
+Spatial focuses on specific type of high-level abstractions required to create a new high level HDL language in which syntax contains memory, control and accelerator-host interface as an individual entity.
+Spatial claims these particular constructs within the language are better fit for accelerators specially targeting applications with data locality and data parallelism.
+Spatial tries to reduce productivity gap by increasing level of abstraction at the structure domain. Spatial expresses accelerators with untimed module, nested loops and customized memory hierarchy.
+The most advantage of Spatial is limiting the design to these set of constructs and it allows compiler to more easily optimize designs.
+Spatial in fact, is a new DSL language on top of Chisel which tries to strike balance between high-level constructs in the language for improving programmer productivity versus low-level syntax for tuning performance. 
+For instance, to enable the compiler to be able to reason about the loop structures, Spatial limits the types of control structures to four types: FSMs, Foreach, Reduce and MapReduce. 
+Therefore, as long as the hardware accelerator designer can express his design in such patterns, compiler can reason about the available parallelism and automatically pipeline the design.
+However, in many cases such control structures are note enough to express arbitrary designs.
+
+While Spatial has improve the accelerator design productivity compare to classic HDL designs.
+But still to design a specific accelerator design needs to re-implement the accelerator's design in Spatial language. Moreover, Spatial is not designed to be target by high level synthesis tools.
+Therefore, it can not support synthesizing arbitrary designs from behavioral description.
+The main goal of Spatial is limiting DSE by defining higher level abstractions on top of Chisel and enabling compiler to only search trough very limited space.
 
 
+In the rest of the report, we will talk about High-Level Synthesises and different approaches that exist to synthesis from behavioral domain to structural domain.
 
 \subsection{Intorduction to HLS}
 \cite{gajski_1994_introduction}
