@@ -86,9 +86,41 @@ There are two main angles: 1)Chisel improved productivity through new language f
 Chisel by itself do not provide any new hardware abstractions. However, host language features, Scala, allow designs to be more parameterizable and modular~\cite{izraelevitz_2017_firrtl_reusability}.
 For instance,  someone can write a recursive Scala function to construct an adder-reduction tree, parameterized on bit-width.
 Unlike the explicitly unrolled version necessary in Verilog, the same generator could be re-used anywhere an adder tree is desired.
+Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/Introduction/Filter.pdf}
+    \caption{Missing Semantics}
+    \label{fig:filter}
+\end{figure}
+
+
+\begin{listing}[ht]
+    \begin{minted}{Scala}
+
+    abstract class Filter[T <: Data](dtype: T) extends Module {
+    val io  = new Bundle {
+    val in  = Input(Valid(dtype))
+    val out = Output(Valid(dtype))
+    } }
+
+    class FunctionFilter[T <: Data](dtype: T, f: T => T) extends Filter(dtype) {
+    io.out.valid := io.in.valid
+    io.out.bits := f(io.in)
+    }
+
+    \end{minted}
+    \caption{Chisel abstract function filter}
+    \label{listing:genesis2}
+\end{listing}
+
+
+
+
 In another example, designer can write a filter module which takes, as a parameter, a higher-order-function that creates the condition checking hardware.
 The user of this module then only needs to write the filtering condition, re-using the base filter structure.
-There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplocamcy}} as other examples for showing Chisel's power as hardware construction language.
+There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplomacy}} as other examples for showing Chisel's power as hardware construction language.
 The second bold advantage of Chisel compare to HDLs is a Hardware Compiler Framework that looks very much like LLVM~\cite{llvm} applied to hardware generation.
 The Chisel-to-Verilog process forms part of a multi-stage compiler.
 The "Chisel stage/front-end" compiles Chisel to a circuit intermediate representation called FIRRTL (Flexible Intermediate Representation for RTL)~\cite{firrtl}.
@@ -100,15 +132,14 @@ It is designed to resemble the Chisel after all meta-programming has executed. T
 In fact, FIRTTL as the hos language, Chisel, to be used for mostly its met-programming facilities, the Chisel front-end can be very light-weight, and additional HDLs written in other languages can target FIRRTL and reuse the majority of the compiler toolchain.
 
 
-% This hardware compiler uses FIRRTL, Flexible Intermediate Representation for RTL to express hardware constructs.
-% After writing Chisel HLD code, Chisel produces an intermediate representation that represents the standardized elaborated circuit.
-% Th
-
-
+While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall system design productivity.
 
 \section{Spatial}
 Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
-
+% * A practice to improve chisel flexibility
+% * Higher level of abstraction to chisel
+% * Untimed modules
+% * Reduction to parallel patterns
 
 
 
@@ -201,44 +232,6 @@ PolyMage~\cite{mullapudi_asplos_2015_polymage}
 
 
 % \subsection{Generators}
-
-% \subsection{Genesis2/ OpenPiton}
-% Genesis2~\cite{genesis2}
-% % * Adds Perl scripting support to SystemVerilog
-% % * Improve procedural generation
-% %
-% OpenPiton~\cite{balkind_asplos_2016_openpiton}
-% % * written in industry standard Verilog
-% % * FPGA synthesis scripts as well as ASIC backend scripts.
-
-% Genesis2 uses Perl to provide more flexible parameterization and elaboration of hardware blocks written in SystemVerilog.
-
-% OpenPiton has been designed as a platform to enable atscale manycore research. An explicit design goal of OpenPiton is that it should be easy to use by other researchers. To
-% support this, OpenPiton provides a high degree of integration and configurability. Unlike many other designs where
-% the pieces are provided, but it is up to the user to compose
-% them together, OpenPiton is designed with all of the components integrated into the same easy to use build infrastructure providing push-button scalability. Computer architecture researchers can easily deploy OpenPiton’s source code,
-% add in modifications and explore their novel research ideas
-% in the setting of a fully working system. Over 8000 targeted,
-% high-coverage test cases are provided to enable researchers
-% to innovate with a safety net that ensures functionality is
-% maintained. OpenPiton’s open source nature also makes it
-% easy to release modifications and reproduce previous work
-% for comparison or reuse.
-% Beyond being a platform designed by computer architects for use by computer architects, OpenPiton enables researchers in other fields including OS, security, compilers,
-% runtime tools, systems, and even CAD tool design to conduct research at-scale. In order to enable such a wide range
-% of applications, OpenPiton is configurable and extensible.
-% The number of cores, attached I/O, size of caches, number
-% of TLB entries, presence of an FPU, number of threads, and
-% network topology are all configurable from a single configuration file. OpenPiton is easy to extend; the presence of a
-% well documented core, a well documented coherence protocol, and an easy to interface NoC make adding research
-% features easy. Research extensions to OpenPiton that have
-% already been built include several novel memory system explorations, an Oblivious RAM controller, and a new in-core
-% thread scheduler. The validated and mature ISA and software
-% ecosystem support OS and compiler research. The release of
-% OpenPiton’s ASIC synthesis, FPGA synthesis, and back-end
-% (Place and Route) scripts make it easy for others to port to
-% new process technologies or FPGAs. In particular, this enables CAD researchers who need large netlists to evaluate
-% their algorithms at-scale.
 
 
 \paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
