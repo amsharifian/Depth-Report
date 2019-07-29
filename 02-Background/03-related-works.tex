@@ -2,7 +2,9 @@
 
 % Notes 
 
-\subsection{Hardware Definition Languages (HDL)}
+\chapter{Related Works}
+
+\section{Hardware Definition Languages (HDL)}
 
 Hardware description languages like Verilog and VHDL are designed for arbitrary circuit description.
 Initially, these languages are developed as hardware simulation languages, and were only later adopted as a basis for hardware design.
@@ -25,6 +27,8 @@ But why reusing components is important?
 The key benefit of reusing hardware components is that every time a chip is built, we inherently evaluate different design decisions, either implicitly using microarchitectural and domain knowledge, or explicitly through custom evaluation tools.
 Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip. Tensilica applied the same idea to create customized processors~\cite{tensillica}~\cite{tensillica}.
 
+\subsection{BlueSpec}
+
 Another alternative proposal to improve productivity of HLD languages was beginning from a domain-specific application programming language and then generate hardware blocks. 
 Bluespec~\cite{bluespec} is an example of such languages.
 Bluespec Compiler (BSC) is a tool that uses BluespecSystem  Verilog  (BSV)  as  the  design  language.
@@ -41,8 +45,10 @@ programming model, and guarded atomic actions are not a natural way to express a
 Furthermore, in general it is difficult to derive an efficient microarchitecture from a higher-level computation model, especially if the goal is a programmable engine to run many applications, where the human designer would prefer to write a generator to explore this design space in detail.
 
 
-\subsection{Hardware Constructor Languages (HCL)}
+\section{Hardware Constructor Languages (HCL)}
 
+
+\subsection{Genesis2}
 Genesis2~\cite{genesis2} was one of the first attempts to work around these limitations. Genesis2 uses Perl language as a macro processing language to provide more flexible parameterization and elaboration of underlying hardware blocks in SystemVerilog. Listing~\ref{listing:genesis2} shows an example of \textit{Genesis2's code}.
 In this example, perl is using ceil library from POSIX library to set the values for $\$num\_add\_bits$.
 
@@ -77,6 +83,8 @@ In this example, perl is using ceil library from POSIX library to set the values
 
 These approaches allow familiar and powerful languages like Verilog to be macro languages for hardware netlists, but effectively require leaf components of the design to be described in the underlying HDL.
 This combined approach is cumbersome, combining the poor abstraction facilities of the underlying HDL with a completely different high-level programming model that does not understand hardware types and semantics.
+
+\subsection{Chisel and FIRRTL}
 
 Chisel~\cite{chisel} is another successful, modern, generalize HCL which is a domain specific language (DSL) for describing hardware circuits embedded in Scala.
 Chisel provides modern programming language features such as meta-programming and object oriented concept coupled with library availability for accurately specifying low-level hardware blocks, but which can be readily extended to capture many useful high-level hardware design patterns.
@@ -150,30 +158,65 @@ For instance, to enable the compiler to be able to reason about the loop structu
 Therefore, as long as the hardware accelerator designer can express his design in such patterns, compiler can reason about the available parallelism and automatically pipeline the design.
 However, in many cases such control structures are note enough to express arbitrary designs.
 
-While Spatial has improve the accelerator design productivity compare to classic HDL designs.
+While Spatial has improved the accelerator design productivity compare to classic HDL designs.
 But still to design a specific accelerator design needs to re-implement the accelerator's design in Spatial language. Moreover, Spatial is not designed to be target by high level synthesis tools.
 Therefore, it can not support synthesizing arbitrary designs from behavioral description.
 The main goal of Spatial is limiting DSE by defining higher level abstractions on top of Chisel and enabling compiler to only search trough very limited space.
 
+\subsection{High-Level Synthesis}
 
-In the rest of the report, we will talk about High-Level Synthesises and different approaches that exist to synthesis from behavioral domain to structural domain.
+High-level synthesis (HLS) techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application.
+In pure C-to-gates HLS front-end which captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input, in the form of untimed nested parallel loops.
+In the next step, the compiler tries to statically schedule the input algorithm and applies optimizations such as inner loop pipelining, unrolling, and memory banking and buffering~\cite{chung_micro_2010, lee_1989_new, paulin_1989_force}.
+Examples of such HLS tools are LegUp~\cite{canis_2011_legup}, Vivado HLS~\cite{vivadohls}, Intel’s FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel} allow users to write FPGA designs in C/C++ and OpenCL.
+Usually such tools adopt polyhedral tools to automate loop pipelining and banking decisions, but such techniques are limited to only affine accesses withing a single loop nest~\cite{wang_2014_theory}, it does not address non-affine cases or cases where accesses to the same memory occur in multiple loop nests.
 
-\subsection{Intorduction to HLS}
-\cite{gajski_1994_introduction}
+To elaborate more on this limitation of standard HLS approaches, consider the code in Listing~\ref{listing:static_schedule}.
+In this loop there is a control flow decision (if) which depends on the actual data being read from arrays A[] and B[].
+The operation which might take place in a specific iteration (s = s + d) introduces a dependency between iterations and delays the next iteration whenever the condition is true.
+A typical HLS tool needs to create a static schedule for the loops, which means it needs to take the conservative decisions for synthesizing the loop. The compiler has either two choices, make the loop serial and state machine base or make the loop iterations pipeline, which for pipelining it usually need input directives from the input algorithm.
+Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS tools that use statically scheduling approach.
+
+
+\begin{listing}[ht]
+    \begin{minted}{C}
+        float d, s = 0.0;
+        for (int i = 0; i < 100; i++){
+            d = A[i] - B[i];
+            if (d >= 0)
+                s += d:
+        }
+    \end{minted}
+    \caption{Limitations of static scheduling}
+    \label{listing:static_schedule}
+\end{listing}
+
+
+\begin{figure}[!h]
+    \begin{minipage}[t]{\linewidth}
+        \centering
+        \includegraphics[width=1\textwidth]{figures/Introduction/schedule.pdf}
+        \label{fig:no_pipeline}
+    \end{minipage}
+    \hspace{0.1cm}
+    \begin{minipage}[t]{\linewidth} 
+        \centering
+        \includegraphics[width=1\textwidth]{figures/Introduction/schedule.pdf}
+        \label{fig:pipeline}
+    \end{minipage}        
+    \label{fig:schedule}
+    \caption{Static Schedule: no pipeline}
+\end{figure}  
+
+
+
+
 
 \subsection{Chimps, CASH, AHRL}
 
 Chimps~\cite{chimps}, CASH~\cite{budiu_pegasus_2002,budiu_cash_2002}, AHRL~\cite{ahrl}
 % * Generate hardware from ANSI C
 % * mapping each C language construct in a dataflow graph to an HDL block.
-%
-
-\subsection{Vivado/Autopilot / Legup / Intel's FPGA SDK for OpenCL, and SDAccel}
-
-Vivado/Autopilot~\cite{vivado,vivadohls,autopilot} /Legup~\cite{canis_2011_legup} / Intel's FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel}
-% * Applications can be expressed at a high level, in terms of arrays and untimed, nested loops.
-% * commercial HLS tool that generates hardware from C/C++/SystemC languages
-% * Imperative design description
 %
 
 \subsection{ElasticFlow / CGPA}
