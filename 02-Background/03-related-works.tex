@@ -170,6 +170,8 @@ In pure C-to-gates HLS front-end which captures system behavior with a model of 
 In the next step, the compiler tries to statically schedule the input algorithm and applies optimizations such as inner loop pipelining, unrolling, and memory banking and buffering~\cite{chung_micro_2010, lee_1989_new, paulin_1989_force}.
 Examples of such HLS tools are LegUp~\cite{canis_2011_legup}, Vivado HLS~\cite{vivadohls}, Intel’s FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel} allow users to write FPGA designs in C/C++ and OpenCL.
 Usually such tools adopt polyhedral tools to automate loop pipelining and banking decisions, but such techniques are limited to only affine accesses withing a single loop nest~\cite{wang_2014_theory}, it does not address non-affine cases or cases where accesses to the same memory occur in multiple loop nests.
+For instance, Pouchet et al.~\cite{pouchet_2013_polyhedral}  explore combining HLS with polyhedral analysis to optimize input designs for locality and use estimates from HLS tools to drive design space exploration.
+While this captures a larger design space than previous work by including tile sizes, this approach is limited to the capabilities of the HLS tools and to benchmarks that have strictly affine data accesses.
 
 To elaborate more on this limitation of standard HLS approaches, consider the code in Listing~\ref{listing:static_schedule}.
 In this loop there is a control flow decision (if) which depends on the actual data being read from arrays A[] and B[].
@@ -178,18 +180,35 @@ A typical HLS tool needs to create a static schedule for the loops, which means 
 Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS tools that use statically scheduling approach.
 
 
-\begin{listing}[ht]
-    \begin{minted}{C}
-        float d, s = 0.0;
-        for (int i = 0; i < 100; i++){
-            d = A[i] - B[i];
-            if (d >= 0)
-                s += d:
+\begin{figure*}[ht]
+    \begin{minipage}{0.4\linewidth}
+        \begin{minted}{C}
+            float d, s = 0.0;
+            for (int i = 0; i < 100; i++){
+                d = A[i] - B[i];
+                if (d >= 0)
+                    s += d:
         }
     \end{minted}
+    \end{minipage}
+    \begin{minipage}{0.45\linewidth}
+        \begin{minted}{C}
+            float d, s = 0.0;
+            #pragma pipeline
+            for (int i = 0; i < 100; i++){
+                d = A[i] - B[i];
+                if (d >= 0)
+                    s += d:
+        }
+    \end{minted}
+
+    \end{minipage}
+
+
+
     \caption{Limitations of static scheduling}
     \label{listing:static_schedule}
-\end{listing}
+\end{figure*}
 
 
 \begin{figure}[!h]
@@ -201,48 +220,49 @@ Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS too
     \hspace{0.1cm}
     \begin{minipage}[t]{\linewidth} 
         \centering
-        \includegraphics[width=1\textwidth]{figures/Introduction/schedule.pdf}
+        \includegraphics[width=1\textwidth]{figures/Introduction/schedule_pipe.pdf}
         \label{fig:pipeline}
     \end{minipage}        
+    \begin{minipage}[t]{\linewidth} 
+        \centering
+        \includegraphics[width=1\textwidth]{figures/Introduction/schedule_dynamic.pdf}
+        \label{fig:dynamic_schedule}
+    \end{minipage}        
     \label{fig:schedule}
-    \caption{Static Schedule: no pipeline}
+    \caption{Static Schedule: a)no pipeline, b)pipeline}
 \end{figure}  
 
+One solution to come across control dependencies was synthesizing hyperblocks~\cite{hyperblock}.
+Through the use of predication, each hyperblock is transformed into straight-line code and then the computation portion of each hyperblock is next implemented speculatively in the form of predicated execution.
+CASH~\cite{budiu_cash_2002, budiu_pegasus_2002}, AHRL~\cite{ahrl} and CHiMPS~\cite{chimps} are examples of such technique. But the main disadvantage of this paradigm is the requirement for substantial hardware resources, and it's not a scalable approach. While there are other disadvantages like limitation in memory layout~\cite{spatial_computation}.
+
+More recent works like Elastic Circuit~\cite{elasticCircuit, elasticFlow}, CGPA~\cite{cgpa} and ~\cite{josipovic_fpga_2018_dynamically} use dynamically schedule circuit to avoid the limitations in inffering loop pipelining.
+The idea is to refine from triggering the operators through centralized pre-planned controller but to take scheduling decisions locally in the circuit as it runs.
+Therefore, as soon as all the conditions for execution of an operation is satisfied the has to start.
+Figure~\ref{fig:dynamic_schedule} shows the execution of a dynamically scheduled HLS circuit.
+The key to a good execution of this loop is that, ideally, a new value of \code{i} should be used to start computing \code{A[i] - B[i]} on every cycle.
+While this techniques can dynamically provides better schedule compare to other statically scheduled HLS techniques.
+But it is clear that, as in the case of processors, taking scheduling decisions dynamically costs resources and time such as the area and delay of the control elements.
 
 
-
-
-\subsection{Chimps, CASH, AHRL}
-
-Chimps~\cite{chimps}, CASH~\cite{budiu_pegasus_2002,budiu_cash_2002}, AHRL~\cite{ahrl}
-% * Generate hardware from ANSI C
-% * mapping each C language construct in a dataflow graph to an HDL block.
-%
-
-\subsection{ElasticFlow / CGPA}
-
-ElasticFlow~\cite{elasticFlow} / CGPA~\cite{cgpa} / Dynamic schedule dataflow~\cite{josipovic_fpga_2018_dynamically}
+% ElasticFlow~\cite{elasticFlow} / CGPA~\cite{cgpa} / Dynamic schedule dataflow~\cite{josipovic_fpga_2018_dynamically}
 % * More recent works like ElasticFlow and CGPA
 % * generate coarse-grained pipelines using FIFOs in between stages for communication.
 %
 
-\subsection{Gorill}
-Gorill~\cite{lavasani_thesis}
-% * Gorilla++ generates custom hardware for applications with irregular dataflow 
-% * support multi-threading and lock-based synchronization
 
-\subsection{Kiwi}
-Kiwi~\cite{kiwi}
-% * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
-Kiwi translates a set of $C\#$ parallel constructs (e.g., event, monitor,
-and lock) to corresponding hardware units.
+% \subsection{Kiwi}
+% Kiwi~\cite{kiwi}
+% % * translates a set of C# parallel constructs to hardware units (monitor, event, lock)
+% Kiwi translates a set of $C\#$ parallel constructs (e.g., event, monitor,
+% and lock) to corresponding hardware units.
 
-\subsection{Lime}
-Lime~\cite{lime}
-% * hardware from functional parallel patterns. (map, reduce, split, join)
-% * Java and automatically targets CPUs, GPUs, and FPGAs
-%
-Lime is a Java-based programming model and runtime from IBM which aims to provide a single unified language to program heterogeneous architectures. Lime natively supports custom bit precisions and includes collection operations, with parallelism in such operations inferred by the compiler. Coarse-grained pipeline and data parallelism are expressed through ``tasks''. Coarse-grained streaming computation graphs can be constructed using built-in constructs like \texttt{\small{connect}}, \texttt{\small{split}}, and \texttt{\small{join}}. The Lime runtime system handles buffering, partitioning, and scheduling of stream graphs. However, coarse-grained pipelines which deviate from the streaming model are not supported, and the programmer has to use a low-level messaging API to handle coarse-grained graphs with feedback loops. Additionally, the compiler does not perform automatic design tuning. Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
+% \subsection{Lime}
+% Lime~\cite{lime}
+% % * hardware from functional parallel patterns. (map, reduce, split, join)
+% % * Java and automatically targets CPUs, GPUs, and FPGAs
+% %
+% Lime is a Java-based programming model and runtime from IBM which aims to provide a single unified language to program heterogeneous architectures. Lime natively supports custom bit precisions and includes collection operations, with parallelism in such operations inferred by the compiler. Coarse-grained pipeline and data parallelism are expressed through ``tasks''. Coarse-grained streaming computation graphs can be constructed using built-in constructs like \texttt{\small{connect}}, \texttt{\small{split}}, and \texttt{\small{join}}. The Lime runtime system handles buffering, partitioning, and scheduling of stream graphs. However, coarse-grained pipelines which deviate from the streaming model are not supported, and the programmer has to use a low-level messaging API to handle coarse-grained graphs with feedback loops. Additionally, the compiler does not perform automatic design tuning. Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
 
 \subsection{CMOST/ParallelXL}
 CMOST~\cite{zhang_DAC_2015_cmost}, ParallelXL~\cite{chen_micro_2018_parallelXL}
@@ -250,7 +270,12 @@ CMOST~\cite{zhang_DAC_2015_cmost}, ParallelXL~\cite{chen_micro_2018_parallelXL}
 
 
 
-\section{Image Processing DSLs}
+\section{System-Level HLS tools}
+
+\subsection{Gorill}
+Gorill~\cite{lavasani_thesis}
+% * Gorilla++ generates custom hardware for applications with irregular dataflow 
+% * support multi-threading and lock-based synchronization
 
 \subsection{HIPACC}
 HIPACC~\cite{membarth_2016_hipa}
@@ -288,8 +313,6 @@ PolyMage~\cite{mullapudi_asplos_2015_polymage}
 % * generate high-level synthesis tool
 % * line buffer
 
-
-% \subsection{Generators}
 
 
 \paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
