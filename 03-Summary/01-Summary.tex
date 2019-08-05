@@ -1,11 +1,11 @@
 %!TEX root = ../main.tex
 
-\section{Summary}
+\chapter{Summary}
 
 
 In this section, we summarizes the related work in table XXX
 
-\subsection{Conclusion} 
+\section{Conclusion} 
 \paragraph{Limitation of current HLS tools:}
 Unfortunately, compiler IRs suffer from two broad limitations that make them ill suited for studying microarchitecture tradeoffs, i) they are based on the control-driven Von-Neumann execution  model,  whereas  accelerator  architecture  typically adopt a dataflow-based execution model, and ii) they represent execution behavior and not the actual structural components ofa microarchitecture, which makes it challenging to understand the  effects  of  a  compiler  IR  transformation  on  the  final accelerator  architecture  that  is  created.
  Current  HLS  tools,are aware of these limitations and encourage users to scatter structural hints in the behavior description in C. However, this closely ties in behavioral correctness with microarchitecture structures, requires are challenging to modify.
