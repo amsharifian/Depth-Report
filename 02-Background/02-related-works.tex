@@ -142,7 +142,7 @@ In fact, FIRTTL as the hos language, Chisel, to be used for mostly its met-progr
 
 While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall system design productivity.
 
-\section{Spatial language}
+\subsection{Spatial language}
 % * Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
 % * A practice to improve chisel flexibility
 % * Higher level of abstraction to chisel
@@ -163,7 +163,7 @@ But still to design a specific accelerator design needs to re-implement the acce
 Therefore, it can not support synthesizing arbitrary designs from behavioral description.
 The main goal of Spatial is limiting DSE by defining higher level abstractions on top of Chisel and enabling compiler to only search trough very limited space.
 
-\section{High-Level Synthesis}
+\section{High-Level Synthesis (HLS)}
 
 High-level synthesis (HLS) techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application.
 In pure C-to-gates HLS front-end which captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input, in the form of untimed nested parallel loops.
@@ -322,4 +322,39 @@ However, coarse-grained pipelines which deviate from the streaming model are not
 Additionally, the compiler does not perform automatic design tuning.
 Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
 
-Another example of non-C language base HLS tool is Kiwi~\cite{kiwi}. Kiwi translates a set of C# parallel constructs (e.g., event, monitor, and lock) to corresponding hardware units.
+
+
+% \subsection{Rigel}
+% Rigel~\cite{hegarty_2016_rigel}
+% * Generate verilog
+% * Coarse-grain pipeline
+% * very similar control semantics to plasticine. Use
+% tokens/back pressure to allow each pipeline stage to fire at their perspective rate
+% * Multi-rate line buffer template
+%
+
+% \subsection{Darkroom}
+% Darkroom~\cite{darkroom}
+% * target ASIC, FPGA, fast CPU
+% * generate structured verilog
+% * line buffer
+% * scheduling for inner loop pipeline. Use ILP to improve pipeline delay
+%
+
+% \subsection{PolyMage}
+% PolyMage~\cite{mullapudi_asplos_2015_polymage}
+% * point=wise, stencil, sampling, operation
+% * functional (in a kind of awkward way)
+% * python
+% * generate openMP/C++
+% * generate high-level synthesis tool
+% * line buffer
+
+
+
+\paragraph{Conclusion: } While these improvements allow for more powerful meta-programming compared to Verilog \texttt{\small{generate}} statements, users still write programs at a timed circuit level.
+% \subsection{Hardware generator languages}
+% \begin{enumerate}
+%     \item Chisel, Firrtl
+%     \item Rocket core
+% \end{enumerate}

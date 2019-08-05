@@ -57,7 +57,7 @@ In that case, the physical design then may contain components of different sizes
 We first explain behavioral model and structural model of each level of abstraction. And then we explain the procedure or moving from behavioral domain to procedural domain.
 
 
-\section{Processor-Level Behavioral Model}
+\section{Behavioral Model}
 \label{sec:processor_level_behavioral_model}
 
 On the processor level, we define and design computational components or processing elements (PEs).
@@ -105,7 +105,7 @@ Note that each state in such a FSM may need several clock cycles to execute its 
     \label{fig:dcfg_model}
 \end{figure}
 
-\section{Processor-Level Structural Model}
+\section{Structural Model}
 
 A processor’s behavioral model, whether defined by a program in C, CDFG, FSM, or by an IS, can be implemented with a set of register-transfer components; such a structural model usually consists of a controller and a datapath like general purpose processors.
 A datapath consists of a set of storage elements (such as registers, register files, and memories), a set of functional units (such as ALUs, multipliers, shifters, and other custom functional units), and a set of busses.
@@ -145,7 +145,7 @@ Selecting components and the structure of a PE and \emph{defining register-trans
 \end{figure}
 
 
-\section{System-Level Model}
+\section{System-Level Synthesis}
 
 Processor-level behavioral models such as the CDFG can be used for specifying a single processor, but will not suffice for describing a complete system that consist of many communicating processors.
 A system-level model must represent multiple processes running in parallel in SW and HW.
