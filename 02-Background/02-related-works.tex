@@ -124,6 +124,30 @@ Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code
 \end{listing}
 
 
+\begin{listing}[ht]
+    \begin{minted}{Scala}
+
+    def clippingFilter[T <: Num](limit: Int, dtype: T) =
+        new FunctionFilter(x => min(limit, max(-limit, x)), dtype)
+
+    \end{minted}
+    \caption{Chisel abstract function filter}
+    \label{listing:chisel_example}
+\end{listing}
+
+\begin{listing}[ht]
+    \begin{minted}{Scala}
+
+    def shiftingFilter[T <: Num](shift: Int, dtype: T) =
+        new FunctionFilter(x => x >> shift, dtype)
+
+    \end{minted}
+    \caption{Chisel abstract function filter}
+    \label{listing:chisel_example}
+\end{listing}
+
+
+
 
 
 In another example, designer can write a filter module which takes, as a parameter, a higher-order-function that creates the condition checking hardware.

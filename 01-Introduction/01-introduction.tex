@@ -22,7 +22,7 @@ Although the flexibility of reconfigurable architectures enables changing the ap
 Reconfigurable devices, usually, accelerates part of the application which contains regular control flow and abundant data parallelism to achieve high performance and efficiency~\cite{spatial_computation, trips, govindaraju_hpca_2011}.
 They can exploit: 1)multiple levels of nested parallelism, 2)data locality with custom data pipelines and 3)defining custom memory hierarchies.
 
-Unfortunately, \textit{all the features that make reconfigurable architectures efficient also make them much more complex to program.}
+Unfortunately, \textit{all the features that make reconfigurable architectures efficient also make them hard to program.}
 For instance, in FPGAs, an accelerator design must account for the timing between pipelined signals and the physically limited compute and memory resources available on the target device.
 It must also manage partitioning of data between local scratchpads and off-chip memory to achieve good data locality~\cite{gzip_2013_fpga}.
 
@@ -34,7 +34,7 @@ becoming infeasible~\cite{cascaval_taxonomy_accelerator}. This leads us to the w
 Figure~\ref{fig:productivity} shows the growth of design complexity and designer productivity
 over time, as estimated by the Sematech in the mid-1990s. Design complexity
 is fundamentally estimated by Moore’s Law, which predicts a 58%
-annual increase in the number of transistors per chip. Sematech estimates that
+annual increase in the number of transistors per chip. However, Sematech estimates that
 designer productivity has grown and will continue to grow by only 21% per
 year. The result is a wide and growing gap between the chips we can manufacture
 and the chips we can design. 
@@ -46,8 +46,8 @@ and the chips we can design.
     \label{fig:productivity}
 \end{figure}
 
-One of the commonly-accepted solutions for closing the productivity gap as proposed by semiconductor roadmaps is to \emph{raise the level of abstraction in the design process.}
-In order to achieve the acceptable productivity gains and to bridge the semantic gap between higher abstraction levels and low-level implementations, the goal now is to \emph{automate} the system-design process as much as possible.
-However, to make automation possible we need to have: 1)A well-defined system abstraction level, well-known components of particular abstraction level and having a clear semantics for system-design languages.
-The code, however, can be generated in a specific target language such as C>
-In order to understand system-level possibilities more fully, we first explain the different abstraction levels involved in system design.
+One of the commonly-accepted solutions for closing the productivity gap as proposed by semiconductor roadmaps is to \emph{raise the level of abstraction in the design process~\cite{itrs}.}
+But only rising level of abstraction would not be sufficient.
+To achieve the acceptable productivity gains and to bridge the semantic gap between higher abstraction levels and low-level implementations, the goal is to \emph{automate} the system-design process \emph{as much as possible.}
+To make automation possible we need to have: 1)A well-defined system abstraction level, 2)well-known components of particular abstraction level and 3)having a clear semantics to move from a higher level of abstraction to a lower level.
+In the rest of this chapter, we elaborate more on each of these three prerequisites for automation process.
