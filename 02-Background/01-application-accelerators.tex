@@ -128,27 +128,37 @@ Designing such FSM is challenging, we explain more in chapter 2.
 \end{listing}
 
 
+While Control-Data dependency graph can be used to for specifying a single processor, but will not suffice for describing a complete system that consist of many communicating processors.
+We need a mechanism to represent a many-processor platform working in parallel
+or in pipelined mode, with introducing notion of concurrency and pipelining.
+Moreover, we need to have notion of synchronization since each processor can run concurrently and they may exchange data between each other.
+Language extensions such as Cilk~\cite{cilk}/OpenMP and languages like Go with the notion of communication channels provide different mechanism to specify such behavior at the system level.
+
 \section{Structural Model}
 
-A processor’s behavioral model, whether defined by a program in C, Control-Data dependency graph, FSM \emph{can be implemented with a set of register-transfer components}; such a structural model usually consists of a controller and a datapath like general purpose processors.
-A datapath consists of a set of storage elements (such as registers, register files, and memories), a set of functional units (such as ALUs, multipliers, shifters, and other custom functional units), and a set of busses.
-All of these register-transfer components may be allocated in different quantities and types and connected arbitrarily through busses.
-Each component may take one or more clock cycles to execute, each component may be pipelined, and each component may have input or output latches or registers.
-In addition, the entire datapath can be pipelined in several stages in addition to components being pipelined by themselves.
-The choice of components and datapath structure depends on the metrics to be optimized for particular implementation.
+A processor’s behavioral model, whether defined by a program in C, Control-Data dependency graph, FSM \emph{can be implemented with a set of register-transfer components}.
+In such a structural model usually there are a controller and a datapath like general purpose processors.
+A datapath consists of three main component. 1) a set of storage elements such as register files, scratchpads, and memories, 2) a set of functional units such as ALUs, multipliers, shifters, and other custom functional units, and 3)a set of busses.
+All of these components may be allocated in different quantities, size and types and connected arbitrarily through busses.
+Each component may take one or more clock cycles to execute, each component may be pipelined, and each component may have input or output latches.
+In addition, in many processor designs, the entire datapath is pipelined in several stages in addition to components being pipelined by themselves.
+The choice of components and datapath structure depends on the metrics such as performance or energy to be optimized for a particular implementation.
 
-The controller defines the state of the processor clock cycle per clock cycle and issues the control signals for the datapath accordingly.
-The structure of the controller and its implementation depends on whether the processor is a standard processor (such as Xeon, ARM, or a DSP) or a custom-design processor or Intellectual Property (IP) function specifically synthesized for a particular application and platform.
-For instance, in the case of a standard processor, the controller is programmable with a program counter (PC), and an address generator (AG) that defines the next address to be loaded into the PC.
-In the case of specific custom processors, the controller can be implemented with programmability concepts typical of standard processors, and control signal generation of IP implementations like CGRAs.
+The datapath does not work stand alone without a controller.
+The controller defines the state of the processor and issues the control signals for the datapath at each cycle.
+The structure of the controller and its implementation varies depending on whether the processor is a standard processor, like RISC processors, a custom-design processor like special image processing processors. 
+Figure~\ref{fig:proc_structure} shows an example of such control and datapth for a simple 2 stage RISCV sodor core\footnote{\url{https://github.com/librecores/riscv-sodor/wiki}}.
+In the case of a standard processor, the controller is programmable with a program counter (PC), and an address generator (AG) that defines the next address to be loaded into the PC.
+In the case of specific custom processors, the controller can be implemented with programmability concepts typical of standard processors.
 
-\begin{figure}[h]
+
+
+\begin{figure}[!t]
     \centering
-    \includegraphics[width=0.6\textwidth]{figures/Introduction/Processor_Structure.pdf}
-    \caption{Processor structure model}
+    \includegraphics[width=\textwidth]{figures/Introduction/2stage.pdf}
+    \caption{Processor structure model -- 2 Stage RISCV core}
     \label{fig:proc_structure}
 \end{figure}
-
 
 
 \section{Processor-Level Synthesis}
