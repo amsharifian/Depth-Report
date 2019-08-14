@@ -13,9 +13,8 @@
 
 \section{Abstraction Levels}
 
-The growing capabilities of silicon technology over the previous decades has forced design methodologies and tools to move to higher levels of abstraction
-In order to explain the relationship between different design methodologies on
-different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model} to explain differences between different design tools and different design methodologies in which these tools were used.
+The growing capabilities of silicon technology over the previous decades has forced design methodologies and tools to move to higher levels of abstraction.
+In order to explain the relationship between different design methodologies on different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model}~\ref{fig:y-chart}.
 
 \begin{figure}[h]
     \centering
@@ -24,58 +23,64 @@ different abstraction levels, we will use the Y-Chart~\cite{walker_1985_y_model}
     \label{fig:y-chart}
 \end{figure}
 
-Y-Chart divides design representation into three domains:1)Behavioral, it can also called functionality and specification, 2)Structural, also called netlist or a block diagram and 3)Physical, usually called layout or board design. Behavior represents a design as a black-box but it describes the output base on inputs over time. What behavior representation doesn't specify is how the black-box is structured or how to build the black-box. This is the task of structural representation. In this specification, black-box is represented as a set of components and connections. While, it's possible to drive the behavior of black-box from its components and its connections but understanding the behavior can be very difficult since it is obscured by the details of each component and connection.
-Eventually, physical design describe different dimension of each component.
+Y-Chart divides design representation into three domains, three axises on the chart:
+1)The behavioral domain describes the behavior, or functionality, of the design, ideally without any reference to the way this behavior is achieved by an implementation.
+Behavioral represents a design as a black-box but it describes the output base on inputs over time.
+What behavior representation doesn't specify is how the black-box is structured or how to build the black-box.
+2)The structural domain describes the abstract implementation, or logical structure, of the design as a hierarchy of components and their interconnections.
+In this specification, black-box is represented as a set of components and connections.
+While, it's possible to drive the behavior of black-box from its components and its connections but understanding the behavior can be very difficult since it is obscured by the details of each component and connection.
+3)Physical, usually called layout or board design.
+Physical design describe different dimension of each component.
 
-The Y-chart also defines multiple level of abstractions for a design by drawing concentric circles on the Y. Typically, four levels are used: system, processor, logic and circuit levels.
-The name of each abstraction level is derived from the types of the components generated on that abstraction level.
-For instance, on the processor level, we generate standard and custom processors, or special-hardware components such as memory controllers, arbiters, brides and various interface components. At the higher level, system level, we design standard or embedded systems consisting of processors, memories, buses, and other processor components.
-
-Let's look at binary counter as an example. In this example at the algorithmic-level, we only know that at every cycle the input value will be increased by one and the output in the next cycle would be the input plus one.
-At the next lower level, we understand that to carry out this function some sort of register is needed to hold the value of the counter.
-We can state this idea using a register transfer statement such as $AC \leftarrow AC + 1$.
-On the structural side, the register consists of gates and flip-flops, which themselves consist of transistors.
+The Y-chart contains three axises to represent design domains.
+It also contains concentric circles to defines multiple level of abstractions for a design.
+Gajski~\cite{gajski_1992_high} proposed four levels of abstraction: system, processor, logic and circuit levels.
+In this model, the name of each abstraction level is derived from the types of the components generated on that abstraction level.
+For instance, on the processor level, we generate general purpose and \emph{custom} processors, or \emph{special-hardware components} such as memory controllers, arbiters, bridges and various interface components.
+At the higher level, system level, we design standard or embedded systems consisting of processors, memories, buses, and other processor components.
+In the next two other level, we describe the circuit in terms of registers and the data transfer between the registers, logic level. Finally, circuit level or transistor level, implements the behavior of logic gates.
+In the rest of this report we focus on only the first two level of abstraction, processor and system.
 
 On each abstraction level, we need a library of components to be used in building \emph{the structure} for a given \emph{behavior}.
-This process of converting the given behavior into a structure for a given haviour is called \textbf{synthesis}.
-Once a structure is defined and verified, we can proceed to the next lower abstraction level by further synthesizing each of the components in the structure.
-On the other hand, if each component in the library is given with its structure and
-the physical implementation, we can proceed with physical design.
-Thus each component in the library may have up to three different models representing
-three different axes in the Y-Chart: behavior or function; structure, which
-contains the components from the lower level of abstraction; and the physical.
-
-In the rest of this chapter we focus on the first two level of abstractions, \textit{Processr} and \textit{System}.
-Fortunately, all three models for each component are not typically needed most of the time.
-Most of the methodologies presently in use perform design or synthesis on the system and processor levels, where every system component except standard processors and memories is synthesized to the logic level, before the physical design is performed on the logic level.
-Therefore, for the top three abstraction levels, we only need a functional model of each component with estimates of the key metrics such as performance, delay, power, cost, size, reliability, testability, etc.
-Once the design is represented in terms of logic gates and flip-flops, we can use standard cells for each logic component and perform layout placement and routing.
-On the other hand, some components on the processor-and-system levels may be obtained as IPs and not synthesized.
-Therefore, their structure and physical design are known, at least partially, on the level higher than logic level.
+The process of converting the given behavior into a structure for a given haviour is called \textbf{synthesis}.
+Once a structure is defined and verified, we can proceed to the next lower abstraction level by further synthesizing each components to their corresponding structure.
+Thus, each component in the library may have up to three different models representing three different axes in the Y-Chart: behavior or function; structure, which contains the components from the lower level of abstraction and the physical.
+Fortunately, to design a new hardware all three models for each component are not typically needed most of the time.
+Most of the methodologies presently in use, which we are going to discuss in the next chapter, perform design or synthesis on the system and processor levels.
+At these two levels, every system component except memories is synthesized to the logic level, before the physical design is performed on the logic level.
+Once the design is represented in terms of logic gates, depending on the target backend, we can perform layout placement, routing and used standard cells for each logic components, like wires and registers.
+On the other hand, some components on the processor-and-system levels may be obtained as IPs and not synthesized, for example DSP blocks in FPGAs.
+Therefore, their structure and physical design are known, on the level higher than logic level.
 In that case, the physical design then may contain components of different sizes and from different levels of abstraction.
-
-We first explain behavioral model and structural model of each level of abstraction. And then we explain the procedure or moving from behavioral domain to procedural domain.
+In the rest of this report we focus on the first two level of abstractions: \textit{Processor} and \textit{System}, how these abstraction can be expressed a programming languages and the process of \emph{synthesis} at these two levels.
 
 
 \section{Behavioral Model}
 \label{sec:processor_level_behavioral_model}
 
-On the processor level, we define and design computational components or processing elements (PEs).
-Each PE can be a dedicated or custom component that computes some specific functions, or it can be a general or standard PE that can compute any function specified in some standard programming language.
+On each abstraction level we design components with different granularity with programming languages. At the processor level, the core building block of design is processing elements (PEs).
+PEs are computational components that we define and design to do operations.
+Each PE can be either a dedicated or a custom component that computes some specific functions.
+It can be a general, like ALU at processors, or standard PE that can compute any function specified in some standard programming language.
 The functionality or behavior of each PE can be specified in several different ways.
-
 In the basic implementation of PEs, their functionality can be specified with mathematical expressions or formulas.
-But there is no limitation on what the functionaly of a PE can be.
+However, there is no limitation on what the functionally of a PE can be.
 Therefore, we can expand the functionality of a PE and specify it with an algorithm in some \textit{programming language}.
-If we want to go beyond a mathematical expression, we solution is to use Finite State Machines (FSMs).
-A FSM is defined with a set of states and a set of transitions from state to state, which are taken when some input variables reach the required value. Furthermore, each FSM generates some val- ues for output variables in each state or during each transition. A FSM model can be made clock-accurate if each state is considered to take one clock cycle. In general, a FSM model is useful for computations requiring several hundred states at most.
-
-This FSM model use standard integer or floating-point variables and computing their values in each state or during each transition by a set of arithmetic expressions or programming statements.
-For example, Figure~\ref{fig:fsm_model} shows a FSM with three states, S1, S2, and S3, and with arcs representing state changes under different inputs.
+For instance, we can define three PEs with three different mathematical expression: $y = |b|$, $x = |a|$ and $z = max (x, y)$.
+Using only mathematical expressions and PEs, however, to define different type of computation is not sufficient.
+To go beyond a mathematical expression and add the notion of control, one possible solution is to use Finite State Machines (FSMs).
+A FSM is defined with a set of states and a set of transitions from state to state, which are taken when some input variables reach the required value.
+Furthermore, each FSM generates some values for output variables in each state or during each transition. A FSM model can be made clock-accurate if each state is considered to take one clock cycle.
+Figure~\ref{fig:fsm_model} shows an example of a FSM which connected our three PEs.
+The example FSM has three states, S1, S2, and S3, and arcs representing state changes under different inputs.
 Each state executes a computation represented by one or more arithmetic expressions or programming statements.
 For example, in state S1, the FSM in Figure~\ref{fig:fsm_model} computes two functions, $x = |a|$ and $y = |b|$, and in state S3 it computes the function $z = max (x, y)$.
-A FSM model is usually not clock-accurate since computation in each state may take more than one clock cycle.
-Therefore, using FSM model to represent computation expressed by programming languages like C is not adequet.
+Hardware Definition Languages (HDLs) like Verilog and VHDL have support for both mathematical expression to become PEs and FSM model to support control structures at their behavioral level.
+But there is a limitation in FSM model that makes it insufficient to express different type of computations.
+FSM model is usually not clock-accurate since computation in each state may take more than one clock cycle.
+Hence, for representing computation expressed by programming languages like C, FSM model is not adequate and we need a more comprehensive model.
+
 
 \begin{figure}[h]
     \centering
@@ -85,31 +90,49 @@ Therefore, using FSM model to represent computation expressed by programming lan
 \end{figure}
 
 
-In general, programming languages consist of \code{if} statements, loops, and expressions.
-An \code{if} statement has two parts, then and else, in which then is executed \code{if} the conditional expression given in the \code{if} statement is true, otherwise the else part is executed.
+In general, programming languages consist of three elements: \code{if} statements, loops, and expressions.
+An \code{if} statement has two parts, then and else, in which then is executed if the conditional expression given in the \code{if} statement is true, otherwise the \code{else} part is executed.
 In each of the then or else parts, the \code{if} statement computes \emph{a set of expressions called a Basic Block (BB)}.
 The \code{if} statement can also be used in the loop construct to represent loop iterations, which are executed as long as the condition in the \code{if} statement is true.
-Therefore, any programming-language code can be represented by a Control-Data Flow Graph (CDFG) consisting of \code{if} diamonds, which represent \code{if} conditions, and BB blocks, which represent computation [151].
-Figure~\ref{fig:dcfg_model} shows such a CDFG, this one representing a loop with an \code{if} statement inside the loop iteration.
-In each iteration, the loop construct executes BB1 and BB2 or BB3 depending on the value of \code{if} statement.
-At the end, the loop is exited if all all iterations are executed.
+As a result, the combination of \code{if} statements, Control-Flow Graph (CFG) and BBs, Data-Flow Graph (DFG) can represent any programming-language code.
+ 
+Figure~\ref{fig:c_example} shows an example of such a CFG and DFG combination. 
+In this this example, we represent a loop with an \code{if} statement inside the loop iteration.
+In each iteration, the loop construct executes BB1 and BB2 or BB3 depending on the value of \code{if} statement. At the end, the loop is exited if all all iterations are executed.
 
-A CDFG shows explicitly the control dependencies between loop statements, if statements, and BBs, as well as the data dependences among operations inside a BB.
-It can be converted to a FSM by assigning a state to each BB and one state for the computation of each if conditional.
-Note that each state in such a FSM may need several clock cycles to execute its assigned BB or if condition.
+A Control-Data dependency graph shows explicitly the control dependencies between loop statements, if statements, and BBs, as well as the data dependences among operations inside a BB.
+On can convert Control-Data dependency graph to a FSM by assigning a state to each BB and one state for the computation of each if conditional.
+However, each state in such a FSM may need several clock cycles to execute its assigned BB or if condition.
+Designing such FSM is challenging, we explain more in chapter 2.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.55\textwidth]{figures/Introduction/CFG.pdf}
-    \caption{FSM model}
-    \label{fig:dcfg_model}
-\end{figure}
+\begin{listing}[!h]
+    \begin{minipage}{0.5\textwidth}
+        \begin{minted}{C++}
+            for(int i = 0; i < N; i++){
+                if(i % 2 == 0){
+                    a = b + c;
+                    b = c * 4;
+                }
+                else {
+                    a = b - c;
+                    c = b * 4;
+                }
+            }
+        \end{minted}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+       \includegraphics[width=0.85\textwidth]{figures/Introduction/CFG.pdf}
+    \end{minipage}
+    \caption{A C program example}
+    \label{fig:c_example}
+\end{listing}
+
 
 \section{Structural Model}
 
-A processor’s behavioral model, whether defined by a program in C, CDFG, FSM, or by an IS, can be implemented with a set of register-transfer components; such a structural model usually consists of a controller and a datapath like general purpose processors.
+A processor’s behavioral model, whether defined by a program in C, Control-Data dependency graph, FSM \emph{can be implemented with a set of register-transfer components}; such a structural model usually consists of a controller and a datapath like general purpose processors.
 A datapath consists of a set of storage elements (such as registers, register files, and memories), a set of functional units (such as ALUs, multipliers, shifters, and other custom functional units), and a set of busses.
-All of these register-transfer components may be allocated in different quantities and types and connected arbitrarily through busses or a network-on-chip (NOC).
+All of these register-transfer components may be allocated in different quantities and types and connected arbitrarily through busses.
 Each component may take one or more clock cycles to execute, each component may be pipelined, and each component may have input or output latches or registers.
 In addition, the entire datapath can be pipelined in several stages in addition to components being pipelined by themselves.
 The choice of components and datapath structure depends on the metrics to be optimized for particular implementation.
