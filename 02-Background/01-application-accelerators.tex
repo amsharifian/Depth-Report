@@ -186,25 +186,18 @@ And finally, model refinement is the last task that synthesizer needs to do to g
 
 \section{System-Level Synthesis}
 
-Processor-level behavioral models such as the Control-Data dependency graph can be used for specifying a single processor, but will not suffice for describing a complete system that consist of many communicating processors.
-A system-level model must represent multiple processes running in parallel in SW and HW.
-The easiest way to do this is to use a model which retains the concept of states and transitions as in a FSM but which extends the computation in each state to include processes or procedures written in a programming language such as C/C++.
-Furthermore, in order to represent a many-processor platform working in parallel or in pipelined mode, we must introduce concurrency and pipelining.
-Since processes in a system run concurrently, we need a synchronization mechanism for data exchange, such as the concept of a channel, to encapsulate data communication.
-Also, we need a model which supports hierarchy, so as to allow designers to write complex system specifications without difficulty.
-Figure~\ref{fig:task_graph} illustrates such a model of hierarchical sequential-parallel processes, which is
-usually called a Process State Machine (PSM).
-This particular PSM is a system-level behavior or system specification, consisting of processes P1 to P5.
-The
-system starts with P1, which in turn triggers process P2 if condition d is true, or
-another process consisting of P3, P4, and P5 if condition d is not true. P3 and
-P4 run sequentially and in parallel with P5, as indicated by the vertical dashed
-line. When either P2 is finished or the sequential-parallel composition of P3,
-P4, and P5 is finished, the execution ends.
+A complete system contains multiple processors and shared resources that they are connected to each other with communication mediums such as buses, network on chips and etc.
+To synthesis a system at the behavioral level we need to start with a task graph to express the concurrent behavior of processes.
+Figure~\ref{fig:task_graph} shows an example of behavioral description of a whole system model, this description can happen in programming languages that have support for concurrency and synchronization mechanisms.
+
+In Figure~\ref{fig:task_graph} model, there are five processes, P1 to P5.
+The system starts with P1, which conditionally triggers either P2 or another process consisting of P3, P4 and P5.
+In this subprocess, P3 and P4 runs sequentially and in parallel with P5. In this figure, solid lines indicates sequential dependency, line buffers indicated concurrent relation between processes and dashed lines indicated sync points for parallel processes.
+Eventually, when either P2 is finished or the sequential-parallel composition of P3, P4, and P5 is finished, the execution ends.
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.4\textwidth]{figures/Introduction/Task_Graph.pdf}
+    \includegraphics[width=0.55\textwidth]{figures/Introduction/Task_Graph.pdf}
     \caption{System behavioral model}
     \label{fig:task_graph}
 \end{figure}
