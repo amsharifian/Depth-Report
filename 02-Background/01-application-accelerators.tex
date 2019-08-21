@@ -146,7 +146,7 @@ The choice of components and datapath structure depends on the metrics such as p
 The datapath does not work stand alone without a controller.
 The controller defines the state of the processor and issues the control signals for the datapath at each cycle.
 The structure of the controller and its implementation varies depending on whether the processor is a standard processor, like RISC processors, a custom-design processor like special image processing processors. 
-Figure~\ref{fig:proc_structure} shows an example of such control and datapth for a simple 2 stage RISCV sodor core\footnote{\url{https://github.com/librecores/riscv-sodor/wiki}}.
+Figure~\ref{fig:proc_structure} shows an example of such control and datapath for a simple 2 stage RISCV sodor core\footnote{\url{https://github.com/librecores/riscv-sodor/wiki}}.
 In the case of a standard processor, the controller is programmable with a program counter (PC), and an address generator (AG) that defines the next address to be loaded into the PC.
 In the case of specific custom processors, the controller can be implemented with programmability concepts typical of standard processors.
 
@@ -186,46 +186,60 @@ And finally, model refinement is the last task that synthesizer needs to do to g
 
 \section{System-Level Synthesis}
 
-A complete system contains multiple processors and shared resources that they are connected to each other with communication mediums such as buses, network on chips and etc.
-To synthesis a system at the behavioral level we need to start with a task graph to express the concurrent behavior of processes.
+A complete system contains multiple processors and shared resources that they are connected to each other with communication channels.
+To synthesis a system at the behavioral level we start with a task graph to express the concurrent behavior of processes.
 Figure~\ref{fig:task_graph} shows an example of behavioral description of a whole system model, this description can happen in programming languages that have support for concurrency and synchronization mechanisms.
-
 In Figure~\ref{fig:task_graph} model, there are five processes, P1 to P5.
 The system starts with P1, which conditionally triggers either P2 or another process consisting of P3, P4 and P5.
 In this subprocess, P3 and P4 runs sequentially and in parallel with P5. In this figure, solid lines indicates sequential dependency, line buffers indicated concurrent relation between processes and dashed lines indicated sync points for parallel processes.
 Eventually, when either P2 is finished or the sequential-parallel composition of P3, P4, and P5 is finished, the execution ends.
 
-\begin{figure}[h]
-    \centering
-    \includegraphics[width=0.55\textwidth]{figures/Introduction/Task_Graph.pdf}
-    \caption{System behavioral model}
-    \label{fig:task_graph}
+The behavioral model is usually a composition of two objects: processes and channels.
+The structural model, on the other hand, uses different objects: processes are executed by PEs such as standard processors, custom processors and IPs, and channels are implemented by buses or network on chips with well defined protocols.
+Like Processor-level synthesis at System-level synthesis, there are questions which we need to answer.
+For example, how is the memory shared across different processes, what is the memory hierarchy, how to schedule the processes and so on.
+Figure~\ref{fig:task_structure}, shows such system consists of standard PEs, channels, busses and memories.
+
+\begin{figure}[!h]
+    \begin{minipage}{0.5\textwidth}
+       \includegraphics[width=0.85\textwidth]{figures/Introduction/Task_Graph.pdf}
+       \caption{System behavioral model}
+       \label{fig:task_graph}
+    \end{minipage}
+    \begin{minipage}{0.5\textwidth}
+       \includegraphics[width=0.95\textwidth]{figures/Introduction/system_synthesis.pdf}
+       \caption{System structural model}
+       \label{fig:task_structure}
+    \end{minipage}
+    \caption{System-Level synthesis}
+    \label{fig:c_example}
 \end{figure}
-
-
-In the synthesis part we need to answer question like what is the memory model. How is the memory shared across different processes.
 
 
 
 \subsection{Missing Semantics}
 \label{sec:missing_semantics}
 
-A big challenge in \emph{synthesising} is missing semantics. In many cases there are many different representation and design for a same behavioral model. But which model fits better in our design. 
-As an example of this problem, we can look in ~\ref{fig:missing_semantics} at a simple case statement available in any hardware or system modeling language.
-This type of case statement can be used to model a FSM in which every case such as X1,X2, ..., represents a state in which all its next states are de ned.
-This type of case statement can also be used to model a look-up table, in which every case X1, X2, ..., indicates a location in the memory that contains a value in the table.
+The most challenging part of synthesis is \emph{missing semantics}.
+In many cases, there are different representations and designs for a same behavioural model. 
+But which model fits better in our design is the task of synthesizer to understand. 
+As an example of this problem, we can look in Figure~\ref{fig:missing_semantics} at a simple \code{case statement} available in any hardware or system modelling language.
+This type of case statement can be used to model a FSM in which every case expression such as X1, X2, ..., represents a state.
+One more possible way of implementing this type of case statement is using loop-up table.
+In the loop-up table every case X1, X2, ..., indicates a location in the memory that contains a value in the table.
 Therefore,  we can use the same case statement with the same variables and format to describe two completely different components.
-Unfortunately, FSMs and look-up tables require completely different implementations:  a FSM can be implemented with a controller or with logic gates, while a look-up table is usually implemented with some kind of memory.
+The challenge here is that, FSMs and look-up tables require completely different implementations:  a FSM can be implemented with a controller or with logic gates, while a look-up table is usually implemented with some kind of memory.
 It is also possible to implement a FSM with a memory or a table using logic gates.
-However, this would not bea very ef cient implementation, and it would not be acceptable to any designer.
-So a model which uses case statements to model FSMs and tables is good for simulation but not for implementation because neither a designer nor a synthesis tool can determine which type of structure was described by the case statement.
-The lesson is that contemporary modeling languages allow modelers to de-scribe the design in many different ways and to use the same description for different designs details. But for automatic refinement, synthesis, and veri cation, we need clean and unambiguous semantic which uniquely represents all the system concepts in a given model.  Such a clean semantic is missing from most of the simulation-oriented  languages.
+However, this implementation would not be a very efficient, and the logic's performance would not be acceptable.
+
+The lesson is that we learn from this example is that contemporary modeling languages allow modelers to describe the design in many different ways and to use the same description for different designs details. But for automatic refinement, synthesis, we need clean and unambiguous semantic which uniquely represents all the system concepts in a given model.
+Unfortunately, such a clean semantic is missing from most of the high-level synthesis tools, therefore, is very challenging for synthesizer to find the best design for a specific behavioral description.
 In order to have well defined semantics, we need to introduce some form of formalism to models and modeling languages.
 
 
 \begin{figure}[h]
     \centering
-    \includegraphics[width=0.7\textwidth]{figures/Introduction/Missing_Semantics.pdf}
+    \includegraphics[width=0.9\textwidth]{figures/Introduction/Missing_Semantics.pdf}
     \caption{Missing Semantics}
     \label{fig:missing_semantics}
 \end{figure}
@@ -233,31 +247,20 @@ In order to have well defined semantics, we need to introduce some form of forma
 
 \section{Hardware Design Methodologies}
 
-\paragraph{Method1:} Describe-and-Synthesize methodology (late 1980s to late 1990s).
+Before reviewing different languages for describing behavioral model of design, we overview design methodologies for modeling a hardware in the course of the time~\cite{michel_2012_synthesis}.
+
+\paragraph{Method1:} Describe-and-Synthesize methodology.
 The 1980s brought us tools for logic synthesis which have significantly altered design flow, since the behavior and structure of a design were both captured on the logic level.
 Designers specified first what they wanted in Boolean equations or FSM descriptions, and then the synthesis tools generated the implementation in terms of a logic-level netlists.
 In this methodology therefore, the behavior or function comes first, and the structure or implementation comes afterwards.
-Moreover, both of these descriptions are simulatable, which is an marked improvement over Capture-and-Simulate methodology, because it permits much more efficient verification; it makes it possible to verify the descriptions’ equivalence since both descriptions can in principle be reduced to a canonical form.
-However, today’s designs are too large for this kind of equivalence checking.
+However, today’s designs are too large for this kind of methodology.
 By the late 1990s, the logic level had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis.
 Therefore, we now have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural).
 However, the system gap still persists because there was not relation between RTL and higher system level.
 
-\paragraph{Method2:}  The 1980s brought us tools for logic synthesis which have significantly altered design flow, since the behavior and structure of a design were both captured on the logic level.
-Designers specified first what they wanted in Boolean equations or FSM descriptions, and then the synthesis tools generated the implementation in terms of a logic-level netlists.
-In this methodology therefore, the behavior or function comes first, and the structure or implementation comes afterwards.
-Moreover, both of these descriptions are simulatable, which is an marked improvement over Capture-and-Simulate methodology, because it permits much more efficient verification; it makes it possible to verify the descriptions’ equivalence since both descriptions can in principle be reduced to a canonical form.
-However, today’s designs are too large for this kind of equivalence checking.
-
-By the late 1990s, the logic level had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis.
-Therefore, we now have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural).
-However, the system gap still persists because there was not relation between RTL and higher system level.
-
-
-\paragraph{Methode3:}
-Specify, Explore-and-Refine methodology (early 2000s to present).
-In order to close this gap, we must increase the level of abstraction from the RTL to the system level (SL) and to introduce a methodology that includes both SW and HW.
-On the SL, we can start with an executable specification that represents the system behavior; we can then extend the system-level methodology to include several models with different details
+\paragraph{Methode3:} Specify, Explore-and-Refine methodology.
+In order to close this gap, we must increase the level of abstraction from the RTL to the system level and to introduce a methodology that includes both SW and HW.
+On the system level, we can start with an executable specification that represents the system behavior; we can then extend the system-level methodology to include several models with different details
 that correspond to different design decisions. Each model is used to prove some system property: functionality, application algorithms, connectivity, communication, synchronization, coherence, routing, performance, or some design metric such as performance, power, and so on.
 So we must deal with several models in order to verify the impact of design decisions on every metric starting from an executable specification down to the RTL and further to the physical design.
 We can consider each model as a specification for the next level model, in which more implementation detail is added after more design decisions are made.
