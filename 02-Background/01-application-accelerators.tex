@@ -250,23 +250,21 @@ In order to have well defined semantics, we need to introduce some form of forma
 Before reviewing different languages for describing behavioral model of design, we overview design methodologies for modeling a hardware in the course of the time~\cite{michel_2012_synthesis}.
 
 \paragraph{Method1:} Describe-and-Synthesize methodology.
-The 1980s brought us tools for logic synthesis which have significantly altered design flow, since the behavior and structure of a design were both captured on the logic level.
-Designers specified first what they wanted in Boolean equations or FSM descriptions, and then the synthesis tools generated the implementation in terms of a logic-level netlists.
-In this methodology therefore, the behavior or function comes first, and the structure or implementation comes afterwards.
-However, today’s designs are too large for this kind of methodology.
-By the late 1990s, the logic level had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis.
-Therefore, we now have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural).
-However, the system gap still persists because there was not relation between RTL and higher system level.
+In 1980s logic synthesis tools have significantly altered the design flow.
+These tools could capture both the behavior and the structure of a design where both of the these information used to captured on the logic level. Before this time, there was a big gap between software and hardware design, hardware designers used to design hardware based on the software documentation and basic specification. They began the system design with block diagrams and produce gate-level design.
+In the new methodology, designers specified first what they wanted in Boolean equations or FSM descriptions, and then the synthesis tools generated the implementation in terms of a logic-level netlists.
+Hence, the behavior or function comes first, and the structure or implementation comes afterwards.
+The main barrier of such approach for today's design is scalability, because, today’s designs are too large for this kind of methodology.
+Another big change at this period of time was, the \textit{logic level} had been abstracted to the Register-Transfer Level (RTL) with the introduction of cycle-accurate modeling and synthesis.
+As a result, we have two abstraction levels (RTL and logic levels) and two different models on each level (behavioral and structural).
+While all these new features advanced design productivity, but the system gap still persists because there was not relation between RTL and higher system level.
 
-\paragraph{Methode3:} Specify, Explore-and-Refine methodology.
-In order to close this gap, we must increase the level of abstraction from the RTL to the system level and to introduce a methodology that includes both SW and HW.
-On the system level, we can start with an executable specification that represents the system behavior; we can then extend the system-level methodology to include several models with different details
-that correspond to different design decisions. Each model is used to prove some system property: functionality, application algorithms, connectivity, communication, synchronization, coherence, routing, performance, or some design metric such as performance, power, and so on.
-So we must deal with several models in order to verify the impact of design decisions on every metric starting from an executable specification down to the RTL and further to the physical design.
+\paragraph{Methode2:} Specify, Explore-and-Refine methodology.
+In order to close this gap, we must increase \emph{the level of abstraction} from the RTL to the system level and to introduce a \emph{methodology} that includes both SW and HW.
+The idea is that, on the system level, we can start with an executable specification that represents the system behavior; we can then \emph{extend} the system-level methodology to include several models, which they don't necessary exist at the initial executable specification, with different details that correspond to different design decisions.
+Each model is used to describe some system property: functionality and application algorithms, communication, synchronization and coherence or performance and other design metrics.
 We can consider each model as a specification for the next level model, in which more implementation detail is added after more design decisions are made.
-We can label this a Specify-Explore-Refine (SER) methodology [63, 100], in that it consists of a sequence of models in which each model is a refinement of the previous.
-Thus SER methodology follows the natural design process in which designers specify the intent first, then explore possibilities, and finally refine the model according to their decisions.
-SER flow can therefore be viewed as several iterations of the basic Describe-and-Synthesize methodology.
+Janka at ~\cite{janka_2002_specification}, named such methodology as Specify-Explore-Refine (SER), in that it consists of a sequence of models in which each model is a refinement of the previous.
+Thus SER methodology follows the same designer's design process in which designers specify the intent first, then explore possibilities, and finally refine the model according to their decisions.
 
-In order to explain about SER model first we overview the status of methodologies presently in use, their shortcomings, and how to upgrade them to the system level.
-
+In the next chapter, we first overview related works for the first method, such as Hardware Definition Languages (HDL) and extensions to HLDs to increase the level of abstraction at this level. Then we look at the related works for the second methodology like High-Level Synthesis (HLS) tools and different design models involved in this process.
