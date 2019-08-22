@@ -20,21 +20,22 @@ Because the semantics of these languages are based around simulation, synthesiza
 HDL languages do not contain a clear semantic just like software languages, as a result, HLD languages can result in ambiguities that make automated synthesis and verification impossible, due to the unclear semantics involved.
 Moreover, for any design, in order to achieve maximum generality, they require users to explicitly manage timing, control signals, and local memories.
 
-% 1.What is the HDL limitation related to our goal
-% 2. How we can improve it?
-
-A big limitation of HDL languages is that these languages lack the powerful abstraction and facilities that
-are common in modern software languages, which leads to low designer productivity by making it difficult to reuse components~\cite{shacham_rethinking_2010}.
-Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures. 
-However, traditional HLDs have limited support for auto generating modules and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
+A big limitation of HDL languages is that these languages lack the powerful abstraction and facilities that are common in modern software languages, which leads to low designer productivity.
+For instance, reusability is one of such powerful facilities that HDL languages inherently are aboard to reuse hardware modules~\cite{shacham_rethinking_2010}.
 Recent extensions such as SystemVerilog~\cite{systemverilog} improved the type system and parameterized generate facilities but still lack many powerful programming language features.
-But why reusing components is important?
 The key benefit of reusing hardware components is that every time a chip is built, we inherently evaluate different design decisions, either implicitly using microarchitectural and domain knowledge, or explicitly through custom evaluation tools.
-Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip. Tensilica applied the same idea to create customized processors~\cite{tensillica}.
+Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip.
+For instance, Tensilica applied the same idea to create customized processors~\cite{tensillica}.
+
+
+Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures. 
+This is another limitation of HLD languages, traditional HLDs have limited support for auto generating modules and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
+
+The first step to synthesis behavioral description model to structural structural model is having more powerful hardware languages that can support such important features like enabling hardware reusability, templatizing and hardware modules. In addition, it let's the compiler to efficiently search the design-space for alternative system designs. In the following we look at some of the works to improve and add such features to traditional HLD languages and talk about pros and cons of each approach.
 
 \subsection{BlueSpec}
 
-Another alternative proposal to improve productivity of HLD languages was beginning from a domain-specific application programming language and then generate hardware blocks. 
+One alternative proposal to improve productivity of HLD languages is beginning from a domain-specific application programming language and then generate hardware blocks. 
 Bluespec~\cite{bluespec} is an example of such languages.
 Bluespec Compiler (BSC) is a tool that uses BluespecSystem  Verilog  (BSV)  as  the  design  language.
 BSV is a high-level functional HDL based on Verilog and inspired by Haskell, where  modules are implemented as a set of rules using  Verilog  syntax.
@@ -43,6 +44,7 @@ The rules are called guarded atomic actions and express behavior in the form of 
 Rules are predicated with a condition. They give the impression of freezing the rest of the system when a given rule's action is carried out after the rule's predicate is true.
 There is an implicit parallelism in this specification, because it is possible for multiple rules to be activated and executed in parallel.
 The compiler automatically schedules the rules such that they are either conflict-free or combined sequentially to preserve the promised atomicity semantic.
+Please find a counter example, implemented in Bluespec, in  Appendix.
 
 While these can provide great designer productivity when the task in hand matches the pattern encoded in the application programming model, they are a poor match for tasks outside their domain.
 For example, the design of a programmable microprocessor is not well described in a stream
@@ -51,10 +53,8 @@ Furthermore, in general it is difficult to derive an efficient microarchitecture
 
 
 \section{Hardware Constructor Languages (HCL)}
-
-
 \subsection{Genesis2}
-Genesis2~\cite{genesis2} was one of the first attempts to work around these limitations. Genesis2 uses Perl language as a macro processing language to provide more flexible parameterization and elaboration of underlying hardware blocks in SystemVerilog. Listing~\ref{listing:genesis2} shows an example of \textit{Genesis2's code}.
+Genesis2~\cite{genesis2} was one of the first attempts to work around mentioned limitations, specially reusability. Genesis2 uses Perl language as a macro processing language to provide more flexible parameterization and elaboration of underlying hardware blocks in SystemVerilog. Listing~\ref{listing:genesis2} shows an example of \textit{Genesis2's code}.
 In this example, perl is using ceil library from POSIX library to set the values for $\$num\_add\_bits$.
 
 \begin{listing}[ht]
@@ -94,7 +94,8 @@ This combined approach is cumbersome, combining the poor abstraction facilities 
 Chisel~\cite{chisel} is another successful, modern, generalize HCL which is a domain specific language (DSL) for describing hardware circuits embedded in Scala.
 Chisel provides modern programming language features such as meta-programming and object oriented concept coupled with library availability for accurately specifying low-level hardware blocks, but which can be readily extended to capture many useful high-level hardware design patterns.
 
-There is a question that always exist about HCL languages versus HDLs. The question is that \emph{What benefits does Chisel offer over classic Hardware Description Langues?\footnote{\url{https://github.com/freechipsproject/chisel3}}}
+To see how Chisel could improved the limitations of traditional HDL languages, we try to answer the following question:
+\emph{What benefits does Chisel offer over classic Hardware Description Langues?\footnote{\url{https://github.com/freechipsproject/chisel3}}}
 There are two main angles: 1)Chisel improved productivity through new language features and availability of reusable libraries. 2)Improved specialization due to the hardware-compiler structure. We elaborate more on these two angles in the continue.
 Chisel by itself do not provide any new hardware abstractions. However, host language features, Scala, allow designs to be more parameterizable and modular~\cite{izraelevitz_2017_firrtl_reusability}.
 For instance,  someone can write a recursive Scala function to construct an adder-reduction tree, parameterized on bit-width.
@@ -152,13 +153,11 @@ Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code
 \end{listing}
 
 
-
-
-
-In another example, designer can write a filter module which takes, as a parameter, a higher-order-function that creates the condition checking hardware.
+As another example, designer can write a filter module which takes, as a parameter, a higher-order-function that creates the condition checking hardware.
 The user of this module then only needs to write the filtering condition, re-using the base filter structure.
-There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplomacy}} as other examples for showing Chisel's power as hardware construction language.
-The second bold advantage of Chisel compare to HDLs is a Hardware Compiler Framework that looks very much like LLVM~\cite{llvm} applied to hardware generation.
+There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplomacy}} as other examples to show the power of Chisel as a hardware construction language to minimize the limitation of traditional hardware languages.
+
+The second important advantage of Chisel compare to HDLs is a Hardware Compiler Framework that looks very much like LLVM~\cite{llvm} applied to hardware generation.
 The Chisel-to-Verilog process forms part of a multi-stage compiler.
 The "Chisel stage/front-end" compiles Chisel to a circuit intermediate representation called FIRRTL (Flexible Intermediate Representation for RTL)~\cite{firrtl}.
 "FIRRTL stage/mid-end" then optimizes FIRRTL and applies user-custom transformations. Finally the "Verilog stage/back-end" emits Verilog based on the optimized FIRRTL.
@@ -166,9 +165,9 @@ In this process FIRRTL represents the standardized elaborated circuit that the C
 FIRRTL represents the circuit immediately after Chisel's elaboration but before any circuit simplification.
 It is designed to resemble the Chisel after all meta-programming has executed. Thus, a user program that makes little use of meta-programming facilities should look almost identical to the generated FIRRT.
 
-In fact, FIRTTL as the hos language, Chisel, to be used for mostly its met-programming facilities, the Chisel front-end can be very light-weight, and additional HDLs written in other languages can target FIRRTL and reuse the majority of the compiler toolchain.
+In fact, FIRTTL as the host language, Chisel, to be used for mostly its met-programming facilities, the Chisel front-end can be very light-weight, and additional HDLs written in other languages can target FIRRTL and reuse the majority of the compiler toolchain.
 
-
+%% Add more discussion here
 While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall system design productivity.
 
 \section{Spatial language}
