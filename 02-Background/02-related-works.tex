@@ -8,21 +8,26 @@
 
 Hardware description languages like Verilog and VHDL are designed for arbitrary circuit description.
 Initially, these languages are developed as hardware simulation languages, and were only later adopted as a basis for hardware design.
-While HDL language syntaxes' resemble software languages but they concepts are inherently different from software languages.
-Software programs are inherently design to describe an algorithm for processors.
-They have sequential semantics and correctness of the program is defined as executing instructions in the order it is written. Data movement is implicit between instructions and there is a explicit defined memory model.
+While HDL language syntaxes resemble software languages but their concepts are inherently different from software languages.
+Software programs are designed to describe an algorithm for processors.
+They have sequential semantics and correctness of the program is defined as executing instructions in the order the instructions are written.
+Data movement is implicit between instructions and there is a explicit defined memory model.
 In contrast, HLD languages are designed to specify circuit designs.
-Hardware inherently is concurrent, therefor, each statement in HDL language is concurrent with other statements.
+Hardware inherently is concurrent and each statement in HDL language is concurrent with other statements.
 All the dependencies need to be explicit either in the form of wire or register.
 There is no pre-defined memory model. Memory model needs to be explicitly defined and handled in the design.
 Because the semantics of these languages are based around simulation, synthesizable designs must be inferred from a subset of the language, complicating tool development and designer education.
-They can result in ambiguities that make automated synthesis and verification impossible, due to the unclear semantics involved.
-For any design in order to achieve maximum generality, they require users to explicitly manage timing, control signals, and local memories.
+HDL languages do not contain a clear semantic just like software languages, as a result, HLD languages can result in ambiguities that make automated synthesis and verification impossible, due to the unclear semantics involved.
+Moreover, for any design, in order to achieve maximum generality, they require users to explicitly manage timing, control signals, and local memories.
 
-A big limitation of HDL languages is that these languages lack the powerful abstraction facilities that
+% 1.What is the HDL limitation related to our goal
+% 2. How we can improve it?
+
+A big limitation of HDL languages is that these languages lack the powerful abstraction and facilities that
 are common in modern software languages, which leads to low designer productivity by making it difficult to reuse components~\cite{shacham_rethinking_2010}.
-Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures but traditional HLDs have limited module generation facilities and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
-Recent extensions such as SystemVerilog improve the type system and parameterized generate facilities but still lack many powerful programming language features.
+Constructing efficient hardware designs requires extensive design-space exploration of alternative system microarchitectures. 
+However, traditional HLDs have limited support for auto generating modules and are ill-suited to producing and composing the highly parameterized module generators required to support through design-space exploration.
+Recent extensions such as SystemVerilog~\cite{systemverilog} improved the type system and parameterized generate facilities but still lack many powerful programming language features.
 But why reusing components is important?
 The key benefit of reusing hardware components is that every time a chip is built, we inherently evaluate different design decisions, either implicitly using microarchitectural and domain knowledge, or explicitly through custom evaluation tools.
 Rather than building a custom chip, designers create a template, or a chip generator, that can generate the specialized chip. Tensilica applied the same idea to create customized processors~\cite{tensillica}.
