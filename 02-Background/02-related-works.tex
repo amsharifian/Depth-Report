@@ -93,10 +93,10 @@ This combined approach is cumbersome, combining the poor abstraction facilities 
 
 Chisel~\cite{chisel} is another successful, modern, generalize HCL which is a domain specific language (DSL) for describing hardware circuits embedded in Scala.
 Chisel provides modern programming language features such as meta-programming and object oriented concept coupled with library availability for accurately specifying low-level hardware blocks, but which can be readily extended to capture many useful high-level hardware design patterns.
-
 To see how Chisel could improved the limitations of traditional HDL languages, we try to answer the following question:
 \emph{What benefits does Chisel offer over classic Hardware Description Langues?\footnote{\url{https://github.com/freechipsproject/chisel3}}}
-There are two main angles: 1)Chisel improved productivity through new language features and availability of reusable libraries. 2)Improved specialization due to the hardware-compiler structure. We elaborate more on these two angles in the continue.
+There are two main angles to this question: 1)Chisel improved productivity through new language features, like object oriented programming, functional programming and availability of reusable libraries. 2)Improved specialization due to the hardware-compiler structure. We elaborate more on these two angles in the continue.
+
 Chisel by itself do not provide any new hardware abstractions. However, host language features, Scala, allow designs to be more parameterizable and modular~\cite{izraelevitz_2017_firrtl_reusability}.
 For instance,  someone can write a recursive Scala function to construct an adder-reduction tree, parameterized on bit-width.
 Unlike the explicitly unrolled version necessary in Verilog, the same generator could be re-used anywhere an adder tree is desired.
@@ -138,7 +138,7 @@ Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code
 
     \end{minted}
     \caption{Chisel abstract function filter}
-    \label{listing:chisel_example}
+    \label{listing:chisel_example_f2}
 \end{listing}
 
 \begin{listing}[ht]
@@ -149,26 +149,27 @@ Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code
 
     \end{minted}
     \caption{Chisel abstract function filter}
-    \label{listing:chisel_example}
+    \label{listing:chisel_example_f3}
 \end{listing}
 
 
 As another example, designer can write a filter module which takes, as a parameter, a higher-order-function that creates the condition checking hardware.
 The user of this module then only needs to write the filtering condition, re-using the base filter structure.
-There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplomacy}} as other examples to show the power of Chisel as a hardware construction language to minimize the limitation of traditional hardware languages.
+There are mature Chisel projects like \emph{Rocket-Chip~\cite{rocket-chip}} and \emph{Diplomacy~\cite{diplomacy}} that can be used as libraries, as examples of Chisel's modularity.
+Using these libraries user is being able to \emph{just import a RISC-V microprocessor} in the same way that they \emph{just import a graph library} in software.
 
 The second important advantage of Chisel compare to HDLs is a Hardware Compiler Framework that looks very much like LLVM~\cite{llvm} applied to hardware generation.
 The Chisel-to-Verilog process forms part of a multi-stage compiler.
-The "Chisel stage/front-end" compiles Chisel to a circuit intermediate representation called FIRRTL (Flexible Intermediate Representation for RTL)~\cite{firrtl}.
-"FIRRTL stage/mid-end" then optimizes FIRRTL and applies user-custom transformations. Finally the "Verilog stage/back-end" emits Verilog based on the optimized FIRRTL.
-In this process FIRRTL represents the standardized elaborated circuit that the Chisel HDL produces.
+The Chisel front-end compiles Chisel to a circuit intermediate representation called FIRRTL (Flexible Intermediate Representation for RTL)~\cite{firrtl}.
+FIRRTL mid-end then optimizes FIRRTL and applies user-custom transformations.
+Finally the Verilog back-end emits Verilog based on the optimized FIRRTL.
+In this process, FIRRTL represents the standardized elaborated circuit that the Chisel HDL produces.
 FIRRTL represents the circuit immediately after Chisel's elaboration but before any circuit simplification.
-It is designed to resemble the Chisel after all meta-programming has executed. Thus, a user program that makes little use of meta-programming facilities should look almost identical to the generated FIRRT.
+FIRRTL is designed to resemble the Chisel after all meta-programming has executed. Thus, a user program that makes little use of meta-programming facilities should look almost identical to the generated FIRRT.
+In fact, in this architecture Chisel is mostly used for its meta-programming facilities, hence, Chisel front-end can be very light-weight.
+Another advantage of such architecture is that other HLD languages, such as Verilog\footnote{Yosys Verilog-to-Firrtl Front-end: \url{https://github.com/cliffordwolf/yosys}} can target FIRRTL and reuse the majority of the compiler toolchain.
 
-In fact, FIRTTL as the host language, Chisel, to be used for mostly its met-programming facilities, the Chisel front-end can be very light-weight, and additional HDLs written in other languages can target FIRRTL and reuse the majority of the compiler toolchain.
-
-%% Add more discussion here
-While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall system design productivity.
+While these improvements allow for more powerful meta-programming compared to Verilog \code{generate} statements, users still write programs at a timed circuit level. This is still one of the most important limitation of HCLs to improve the overall \emph{system design productivity}.
 
 \section{Spatial language}
 % * Spatial~\cite{david_PLDI_2018_spatial, prabhakar_asplos_2016_parallelpattern}
@@ -177,18 +178,48 @@ While these improvements allow for more powerful meta-programming compared to Ve
 % * Untimed modules
 % * Reduction to parallel patterns
 Recently, Spatial~\cite{david_PLDI_2018_spatial} is been proposed as a language and compiler for applications specific accelerators.
-Spatial focuses on specific type of high-level abstractions required to create a new high level HDL language in which syntax contains memory, control and accelerator-host interface as an individual entity.
-Spatial claims these particular constructs within the language are better fit for accelerators specially targeting applications with data locality and data parallelism.
-Spatial tries to reduce productivity gap by increasing level of abstraction at the structure domain. Spatial expresses accelerators with untimed module, nested loops and customized memory hierarchy.
-The most advantage of Spatial is limiting the design to these set of constructs and it allows compiler to more easily optimize designs.
-Spatial in fact, is a new DSL language on top of Chisel which tries to strike balance between high-level constructs in the language for improving programmer productivity versus low-level syntax for tuning performance. 
-For instance, to enable the compiler to be able to reason about the loop structures, Spatial limits the types of control structures to four types: FSMs, Foreach, Reduce and MapReduce. 
-Therefore, as long as the hardware accelerator designer can express his design in such patterns, compiler can reason about the available parallelism and automatically pipeline the design.
-However, in many cases such control structures are note enough to express arbitrary designs.
+Spatial focuses on specific type of high-level abstractions required to create a new high level HDL language in which syntax contains memory, control and accelerator-host interface as an individual entities.
+Spatial shows these particular constructs within the language are better fit for accelerators specially targeting applications with data locality and data parallelism.
+It reduces productivity gap of HDL, structural languages, by increasing the level of abstraction of HDL languages.
+In Spatial the design is limited to set of constructs and it allows compiler to optimize the design at the higher-level like optimizing and banking memory modules in the design.
+In Spatial, each accelerator is an un-timed module containing  nested loops and customized memory hierarchy. In Listing~\ref{listing:spatial_example} we have shown InnerProduct implementation in Spatial language~\footnote{\url{https://spatial-lang.org/dotprod}}.
+In this example, we can see we have two types of memory \code{DRAM} and \code{SRAM}, there is a \code{Reduce} computation pattern and an input mathematic expression.
 
-While Spatial has improved the accelerator design productivity compare to classic HDL designs.
-But still to design a specific accelerator design needs to re-implement the accelerator's design in Spatial language. Moreover, Spatial is not designed to be target by high level synthesis tools.
-Therefore, it can not support synthesizing arbitrary designs from behavioral description.
+\begin{listing}[ht]
+    \begin{minted}{Scala}
+
+  object InnerProduct extends SpatialApp {
+      val d1 = DRAM[T](len)
+      val d2 = DRAM[T](len)
+
+      Accel {
+        // Create local SRAMs
+        val s1 = SRAM[T](len)
+        val s2 = SRAM[T](len)
+        
+        // Transfer data
+        s1 load d1
+        s2 load d2
+        
+        // Multiply and accumulate
+        x := Reduce(Reg[T](0))(len by 1)
+        {i => s1(i) * s2(i)}{_+_} 
+      }
+    }
+}
+
+    \end{minted}
+    \caption{Chisel abstract function filter}
+    \label{listing:spatial_example}
+\end{listing}
+
+In fact, Spatial, is a new DSL language on top of Chisel which tries to strike balance between high-level constructs in the language for improving programmer productivity versus low-level syntax for tuning performance. 
+For instance, to enable the compiler to be able to reason about the loop structures, Spatial limits the types of control structures into four types: \code{FSMs}, \code{Foreach}, \code{Reduce} and \code{MapReduce}.
+Therefore, as long as the designer can express his design in such patterns, compiler can reason about the available parallelism and automatically pipeline the design.
+However, in many cases such control structures are note enough to express arbitrary designs.
+While Spatial has improved the accelerator design productivity compare to Chisel.
+But Spatial is a structural language, hence, the design needs to be implemented in Spatial language.
+Therefore, synthesizing arbitrary designs from behavioral description can be very challenging because of the missing semantics existing between behavioral model, software, and structural model, Spatial~\ref{sec:missing_semantics}.
 The main goal of Spatial is limiting DSE by defining higher level abstractions on top of Chisel and enabling compiler to only search trough very limited space.
 
 \section{High-Level Synthesis}
