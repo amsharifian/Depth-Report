@@ -224,19 +224,19 @@ The main goal of Spatial is limiting DSE by defining higher level abstractions o
 
 \section{High-Level Synthesis}
 
-High-level synthesis (HLS) techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an application.
-In pure C-to-gates HLS front-end which captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input, in the form of untimed nested parallel loops.
-In the next step, the compiler tries to statically schedule the input algorithm and applies optimizations such as inner loop pipelining, unrolling, and memory banking and buffering~\cite{chung_micro_2010, lee_1989_new, paulin_1989_force}.
+High-level synthesis (HLS) techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description, behavioral description, of an algorithm.
+In pure C-to-gates HLS, front-end captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input. The language components in this case are in the form of untimed mathematical expressions and nested serial loops, pipeline loops or parallel loops.
+In the next step, the compiler statically schedules the input algorithm and applies optimizations such as inner loop pipelining, unrolling, and memory banking and buffering~\cite{chung_micro_2010, lee_1989_new, paulin_1989_force}.
 Examples of such HLS tools are LegUp~\cite{canis_2011_legup}, Vivado HLS~\cite{vivadohls}, Intel’s FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel} allow users to write FPGA designs in C/C++ and OpenCL.
 Usually such tools adopt polyhedral tools to automate loop pipelining and banking decisions, but such techniques are limited to only affine accesses withing a single loop nest~\cite{wang_2014_theory}, it does not address non-affine cases or cases where accesses to the same memory occur in multiple loop nests.
 For instance, Pouchet et al.~\cite{pouchet_2013_polyhedral}  explore combining HLS with polyhedral analysis to optimize input designs for locality and use estimates from HLS tools to drive design space exploration.
 While this captures a larger design space than previous work by including tile sizes, this approach is limited to the capabilities of the HLS tools and to benchmarks that have strictly affine data accesses.
 
-To elaborate more on this limitation of standard HLS approaches, consider the code in Listing~\ref{listing:static_schedule}.
+To show an example of such limitation of standard HLS approaches, consider the code in Listing~\ref{listing:static_schedule}.
 In this loop there is a control flow decision (if) which depends on the actual data being read from arrays A[] and B[].
 The operation which might take place in a specific iteration (s = s + d) introduces a dependency between iterations and delays the next iteration whenever the condition is true.
 A typical HLS tool needs to create a static schedule for the loops, which means it needs to take the conservative decisions for synthesizing the loop. The compiler has either two choices, make the loop serial and state machine base or make the loop iterations pipeline, which for pipelining it usually need input directives from the input algorithm.
-Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS tools that use statically scheduling approach.
+Figure~\ref{fig:no_pipeline} shows the both possible schedules, serial and pipeline, for \code{if} code when we use HLS tools with statically scheduling approach.
 
 
 \begin{figure*}[ht]
@@ -260,11 +260,7 @@ Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS too
                     s += d:
         }
     \end{minted}
-
     \end{minipage}
-
-
-
     \caption{Limitations of static scheduling}
     \label{listing:static_schedule}
 \end{figure*}
@@ -282,20 +278,26 @@ Figure~\ref{fig:schedule} shows the both possible schedule for if we use HLS too
         \includegraphics[width=1\textwidth]{figures/Introduction/schedule_pipe.pdf}
         \label{fig:pipeline}
     \end{minipage}        
-    \begin{minipage}[t]{\linewidth} 
-        \centering
-        \includegraphics[width=1\textwidth]{figures/Introduction/schedule_dynamic.pdf}
-        \label{fig:dynamic_schedule}
-    \end{minipage}        
     \label{fig:schedule}
     \caption{Static Schedule: a)no pipeline, b)pipeline}
 \end{figure}  
 
 
-Another example for HLS is FIR as we had the implementation in Chisel, but this time in C like language for HLS:
+
+While traditional HLS tools claim they can support any arbitrary C/C++ programs, however, they input can be always suboptimal and then the major challenge in HLS become how to write a good C/C++ code targeting HLS tool to get the optimal performance~\cite{cong_2018_best}.
+One of the most challenging part of implementing FIR filter with HLS is having optimizing input C code for an HLS tools~\cite{cong_2018_best}.
+This makes it prohibitive to most software programmers. It is even more challenging when the mainstream algorithm in an application domain is constantly evolving; i.e., an algorithm may have already been obsolete during the development process of its hardware accelerator.
+For instance in Figure~\ref{listing:hls_fir_filter} we show the implementation of FIR filter, the same implementation of FIR filter in example~\ref{fig:filter} with Chisel.
+
+In this example, if you look at line number 12, you will see a \code{pragma} that directs the compiler to how to implement the \code{for}.
+For instance, in this case, have an efficient implementation of \code{for} loop, the designer needs to know what is the minimum, maximum and average \textit{loop trip counts}.
+This information is very low level and it is not trivial specially for software programmers.
+The reason is that, these types of \code{pragma}s are actually structural information and since the compiler can not find the optimal structural implementation for a behavioral description, therefore, HLS designers decided to embed this information to the higher level abstraction.
 
 \begin{listing}[ht]
-    \begin{minted}{C}
+    \begin{minted}
+        [xleftmargin=20pt, linenos]
+        {C}
     #include "fir.h"
 
     out_data_t fir_filter(inp_data_t x, coef_t c[N]) {
@@ -329,9 +331,20 @@ Another example for HLS is FIR as we had the implementation in Chisel, but this 
     \label{listing:hls_fir_filter}
 \end{listing}
 
+
+
 One solution to come across control dependencies was synthesizing hyperblocks~\cite{hyperblock}.
 Through the use of predication, each hyperblock is transformed into straight-line code and then the computation portion of each hyperblock is next implemented speculatively in the form of predicated execution.
 CASH~\cite{budiu_cash_2002, budiu_pegasus_2002}, AHRL~\cite{ahrl} and CHiMPS~\cite{chimps} are examples of such technique. But the main disadvantage of this paradigm is the requirement for substantial hardware resources, and it's not a scalable approach. While there are other disadvantages like limitation in memory layout~\cite{spatial_computation}.
+
+\begin{figure}[!h]
+    \centering
+    \includegraphics[width=1\textwidth]{figures/Introduction/schedule_dynamic.pdf}
+    \label{fig:dynamic_schedule}
+    \caption{Dynamically schedule}
+\end{figure}  
+
+
 
 More recent works like Elastic Circuit~\cite{elasticCircuit, elasticFlow}, CGPA~\cite{cgpa} and ~\cite{josipovic_fpga_2018_dynamically} use dynamically schedule circuit to avoid the limitations in inffering loop pipelining.
 The idea is to refine from triggering the operators through centralized pre-planned controller but to take scheduling decisions locally in the circuit as it runs.
