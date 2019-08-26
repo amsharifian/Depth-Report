@@ -1,0 +1,61 @@
+%!TEX root = main.tex
+
+\chapter{Code}
+
+Bluespec counter example:
+
+\begin{listing}[ht]
+    \begin{minted}{Verilog}
+    // counter + decrement from Chapter 5
+
+    interface Counter;
+        method Bit#(8) read();
+        method Action load(Bit#(8) newval);
+        method Action increment();
+        method Action decrement();
+    endinterface
+    (* synthesize *)
+    module mkCounter(Counter);
+        Reg#(Bit#(8)) value <- mkReg(0);
+
+        PulseWire increment_called <- mkPulseWire();
+        PulseWire decrement_called <- mkPulseWire();
+
+        rule do_increment(increment_called && !decrement_called);
+            value <= value + 1;
+        endrule
+
+        rule do_decrement(!increment_called && decrement_called);
+            value <= value - 1;
+        endrule
+
+        method Bit#(8) read();
+            return value;
+        endmethod
+
+    
+    \end{minted}
+\end{listing}
+
+\begin{listing}[ht]
+    \begin{minted}{Verilog}
+
+        method Action load(Bit#(8) newval);
+            value <= newval;
+        endmethod
+
+        method Action increment();
+            increment_called.send();
+        endmethod
+
+        method Action decrement();
+            decrement_called.send();
+        endmethod
+    endmodule
+    
+    \end{minted}
+    \caption[Caption for LOF]%
+    {A counter implementation in Bluespec~\cite{bluespec}}
+    \label{listing:bluespec}
+\end{listing}
+

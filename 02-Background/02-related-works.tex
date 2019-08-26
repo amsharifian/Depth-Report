@@ -58,27 +58,31 @@ Genesis2~\cite{genesis2} was one of the first attempts to work around mentioned 
 In this example, perl is using ceil library from POSIX library to set the values for $\$num\_add\_bits$.
 
 \begin{listing}[ht]
-    \begin{minted}{Verilog}
-        //; # More Perl Libraries
-        //; use POSIX (ceil);
-        //; my $reg_list = $self->define_param(REG_LIST => 
-        //; [	
-        //;     {name => 'regA', width => 5, default => 17, IEO => 'ie'},
-        //;     {name => 'regB', width => 15, IEO => 'ieo'},
-        //;     {name => 'regC', width => 32, IEO => 'ieo'},
-        //; ]);
-        //; my $num_regs = scalar(@{$reg_list});
-        //; my $num_addr_bits = ceil(log($num_regs)/log(2));
+    \begin{minted}
+        [xleftmargin=20pt,
+        autogobble,
+        linenos] 
+        {Verilog}
+//; # More Perl Libraries
+//; use POSIX (ceil);
+//; my $reg_list = $self->define_param(REG_LIST => 
+//; [	
+//;     {name => 'regA', width => 5, default => 17, IEO => 'ie'},
+//;     {name => 'regB', width => 15, IEO => 'ieo'},
+//;     {name => 'regC', width => 32, IEO => 'ieo'},
+//; ]);
+//; my $num_regs = scalar(@{$reg_list});
+//; my $num_addr_bits = ceil(log($num_regs)/log(2));
 
-        // Verilog code for the module
-        module 'mname()' (
-            input                               Clk,
-            input                               Reset,
-            input ['$num_addr_bits-1':0]        Addr,
-            ...
-            );
+// Verilog code for the module
+module 'mname()' (
+    input                               Clk,
+    input                               Reset,
+    input ['$num_addr_bits-1':0]        Addr,
+    ...
+    );
 
-        endmodule // 'mname()'
+endmodule // 'mname()'
     \end{minted}
     \caption[Caption for LOF]%
     {Genesis2 code example, combining SystemVerilog and Perl~\cite{genesis2}}
@@ -111,18 +115,22 @@ Figure~\ref{fig:filter} shows the specified example and the abstract Chisel code
 
 
 \begin{listing}[ht]
-    \begin{minted}{Scala}
+    \begin{minted}
+        [xleftmargin=20pt,
+        autogobble,
+        linenos] 
+        {Scala}
 
-    abstract class Filter[T <: Data](dtype: T) extends Module {
-    val io  = new Bundle {
-    val in  = Input(Valid(dtype))
-    val out = Output(Valid(dtype))
-    } }
+abstract class Filter[T <: Data](dtype: T) extends Module {
+val io  = new Bundle {
+val in  = Input(Valid(dtype))
+val out = Output(Valid(dtype))
+} }
 
-    class FunctionFilter[T <: Data](dtype: T, f: T => T) extends Filter(dtype) {
-    io.out.valid := io.in.valid
-    io.out.bits := f(io.in)
-    }
+class FunctionFilter[T <: Data](dtype: T, f: T => T) extends Filter(dtype) {
+io.out.valid := io.in.valid
+io.out.bits := f(io.in)
+}
 
     \end{minted}
     \caption{Chisel abstract function filter}
@@ -186,26 +194,30 @@ In Spatial, each accelerator is an un-timed module containing  nested loops and 
 In this example, we can see we have two types of memory \code{DRAM} and \code{SRAM}, there is a \code{Reduce} computation pattern and an input mathematic expression.
 
 \begin{listing}[ht]
-    \begin{minted}{Scala}
+    \begin{minted}
+        [xleftmargin=20pt,
+            autogobble,
+            linenos] 
+        {Scala}
 
-  object InnerProduct extends SpatialApp {
-      val d1 = DRAM[T](len)
-      val d2 = DRAM[T](len)
+object InnerProduct extends SpatialApp {
+    val d1 = DRAM[T](len)
+    val d2 = DRAM[T](len)
 
-      Accel {
-        // Create local SRAMs
-        val s1 = SRAM[T](len)
-        val s2 = SRAM[T](len)
-        
-        // Transfer data
-        s1 load d1
-        s2 load d2
-        
-        // Multiply and accumulate
-        x := Reduce(Reg[T](0))(len by 1)
-        {i => s1(i) * s2(i)}{_+_} 
-      }
+    Accel {
+      // Create local SRAMs
+      val s1 = SRAM[T](len)
+      val s2 = SRAM[T](len)
+      
+      // Transfer data
+      s1 load d1
+      s2 load d2
+      
+      // Multiply and accumulate
+      x := Reduce(Reg[T](0))(len by 1)
+      {i => s1(i) * s2(i)}{_+_} 
     }
+  }
 }
 
     \end{minted}
@@ -238,24 +250,32 @@ Figure~\ref{fig:no_pipeline} shows the both possible schedules, serial and pipel
 
 \begin{figure*}[ht]
     \begin{minipage}{0.4\linewidth}
-        \begin{minted}{C}
-            float d, s = 0.0;
-            for (int i = 0; i < 100; i++){
-                d = A[i] - B[i];
-                if (d >= 0)
-                    s += d:
-        }
+        \begin{minted}
+            [xleftmargin=20pt,
+            autogobble,
+            linenos]
+            {C}
+float d, s = 0.0;
+for(int i=0; i<100; i++){
+    d = A[i] - B[i];
+    if (d >= 0)
+    s += d:
+}
     \end{minted}
     \end{minipage}
     \begin{minipage}{0.45\linewidth}
-        \begin{minted}{C}
-            float d, s = 0.0;
-            #pragma pipeline
-            for (int i = 0; i < 100; i++){
-                d = A[i] - B[i];
-                if (d >= 0)
-                    s += d:
-        }
+        \begin{minted}
+            [xleftmargin=20pt,
+            autogobble,
+            linenos] 
+            {C}
+float d, s = 0.0;
+#pragma pipeline
+for (int i=0; i<100; i++){
+    d = A[i] - B[i];
+    if (d >= 0)
+        s += d:
+    }
     \end{minted}
     \end{minipage}
     \caption{Limitations of static scheduling}
