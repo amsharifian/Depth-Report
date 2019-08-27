@@ -237,7 +237,8 @@ The main goal of Spatial is limiting DSE by defining higher level abstractions o
 \section{High-Level Synthesis}
 
 High-level synthesis (HLS) techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description, behavioral description, of an algorithm.
-In pure C-to-gates HLS, front-end captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input. The language components in this case are in the form of untimed mathematical expressions and nested serial loops, pipeline loops or parallel loops.
+In pure C-to-gates HLS, front-end captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input.
+The language components in this case are in the form of untimed mathematical expressions and nested serial loops, pipeline loops or parallel loops.
 In the next step, the compiler statically schedules the input algorithm and applies optimizations such as inner loop pipelining, unrolling, and memory banking and buffering~\cite{chung_micro_2010, lee_1989_new, paulin_1989_force}.
 Examples of such HLS tools are LegUp~\cite{canis_2011_legup}, Vivado HLS~\cite{vivadohls}, Intel’s FPGA SDK for OpenCL~\cite{opencl_sdk}, and SDAccel~\cite{sdaccel} allow users to write FPGA designs in C/C++ and OpenCL.
 

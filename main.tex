@@ -40,7 +40,7 @@
 \semester{Summer 2019}
 \date{January 10, 2017}
 
-\keywords{thesis template; Simon Fraser University; time travel paradoxes}
+\keywords{HLS, Accelerator design, Synthesis, Configurable architecture, FPGA }
 
 \committee{%
 	\chair{Pamela Isely}{Professor}
@@ -173,13 +173,27 @@
 
 \frontmatter
 \maketitle{}
-\makecommittee{}
+% \makecommittee{}
 
 %\addtoToC{Ethics Statement}%
 %\includepdf[pagecommand={\thispagestyle{plain}}]{ethicsstatement.pdf}%
 %\clearpage
 
 \begin{abstract}
+In recent years, the computing landscape has seen an increasing shift towards specialized accelerators.
+Reconfigurable architectures like FPGAs are particularly promising for accelerator implementation as they can offer performance and energy efficiency improvements over CPUs and GPUs and are more flexible than fixed-function ASICs.
+Unfortunately, adoption of reconfigurable hardware has been limited by their associated tools and programming models:
+hardware description languages (HDLs) lack abstractions for productivity and are difficult to target directly from higher level languages.
+The alternative to HDLs to support higher level of abstraction is High-level synthesis (HLS) tools.
+
+HLS techniques have been proposed to improve the productivity of hardware designers by automatically generating the hardware from a high-level description of an algorithm.
+In HLS tools, front-end captures system behavior with a model of computation in a standard language such as C, C++, SystemC as an input.
+The language components, in this case, are in the form of untimed mathematical expressions and nested, pipeline and parallel loops.
+And then, the compiler schedules the input algorithm and applies optimizations such as inner loop pipelining, unrolling, memory banking and buffering to generate RTL.
+
+The purpose of this work is first to have a clear definition of hardware accelerators and different level of abstraction to express a design. Then we look at state-of-the-art HLS approaches to automatically synthesis hardware from the higher-level description of an algorithm.
+Finally, we look at the limitation of each technique and outline what we believe is the main challenge with the current HLS techniques.
+
 \end{abstract}
 
 
