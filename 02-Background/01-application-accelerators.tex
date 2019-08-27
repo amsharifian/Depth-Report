@@ -108,16 +108,16 @@ Designing such FSM is challenging, we explain more in chapter 2.
 \begin{listing}[!h]
     \begin{minipage}{0.5\textwidth}
         \begin{minted}{C++}
-            for(int i = 0; i < N; i++){
-                if(i % 2 == 0){
-                    a = b + c;
-                    b = c * 4;
-                }
-                else {
-                    a = b - c;
-                    c = b * 4;
-                }
-            }
+for(int i = 0; i < N; i++){
+    if(i % 2 == 0){
+        a = b + c;
+        b = c * 4;
+    }
+    else {
+        a = b - c;
+        c = b * 4;
+    }
+}
         \end{minted}
     \end{minipage}
     \begin{minipage}{0.5\textwidth}

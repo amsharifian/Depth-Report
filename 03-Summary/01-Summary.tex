@@ -2,10 +2,15 @@
 
 \chapter{Summary}
 
+In this survey, we discussed the challenges of hardware accelerator design and the barriers for designers to catch up with the growth of design complexity.
+We used the Y-chart model to define different level of abstractions for designing hardware accelerators and showed to increase design productivity we need to automate the transition process between behavioral to structural domain.
+We provided examples of processor and system-level synthesis and showed because of missing semantics between different domains going from behavioral description to structural description is challenging.
 
-In this section, we summarizes the related work in table XXX
+In the related work section, we first looked at traditional HDL languages and discussed different language extensions that try to increase the productivity of hardware design.
+We argued while there are advances in design productivity with the introduction of HCLs and hardware compiler frameworks like FIRRTL but why such approaches still are aboard to increase the productivity of the whole system design.
+Then we looked at different HLS tools and how they synthesis hardware from languages such as C/C++.
+We discussed the different type of synthesis, different scheduling methods and elaborated more on the disadvantage of each approach.
 
-\section{Conclusion} 
-\paragraph{Limitation of current HLS tools:}
-Unfortunately, compiler IRs suffer from two broad limitations that make them ill suited for studying microarchitecture tradeoffs, i) they are based on the control-driven Von-Neumann execution  model,  whereas  accelerator  architecture  typically adopt a dataflow-based execution model, and ii) they represent execution behavior and not the actual structural components ofa microarchitecture, which makes it challenging to understand the  effects  of  a  compiler  IR  transformation  on  the  final accelerator  architecture  that  is  created.
- Current  HLS  tools,are aware of these limitations and encourage users to scatter structural hints in the behavior description in C. However, this closely ties in behavioral correctness with microarchitecture structures, requires are challenging to modify.
+\paragraph{Conclusion:}
+Unfortunately, current HLS approaches suffer from two broad limitations that make them ill suited for studying microarchitecture tradeoffs, i) they are based on the control-driven Von-Neumann execution  model,  whereas  accelerator  architecture  typically adopt a dataflow-based execution model, and ii) they represent execution behavior and not the actual structural components of a microarchitecture is fixed and only suited for specific type of workloads.
+Current HLS tools, are aware of these limitations and encourage users to scatter structural hints in the behavior description in C. However, this closely ties in behavioral correctness with microarchitecture structures, requires are challenging to modify.

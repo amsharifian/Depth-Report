@@ -355,15 +355,15 @@ But such techniques are limited to only affine accesses withing a single loop ne
 For instance, Pouchet et al.~\cite{pouchet_2013_polyhedral}  explore combining HLS with polyhedral analysis to optimize input designs for locality and use estimates from HLS tools to drive design space exploration.
 While this captures a larger design space than previous work by including tile sizes, this approach is limited to the capabilities of the HLS tools and to benchmarks that have strictly affine data accesses.
 
-Another proposed solution to come across control dependencies, annotating loops with \code{pragma}s, was synthesizing hyperblocks~\cite{hyperblock}.
+Another proposed solution to synthesize control dependencies was synthesizing hyperblocks~\cite{hyperblock}.
 Through the use of predication, each hyperblock is transformed into straight-line code and then the computation portion of each hyperblock is implemented speculatively in the form of predicated execution.
 CASH~\cite{budiu_cash_2002, budiu_pegasus_2002}, AHRL~\cite{ahrl} and CHiMPS~\cite{chimps} are examples of such technique.
 The main disadvantage of this paradigm is the requirement for substantial hardware resources, and it's not a scalable approach. 
-In addition, there are other disadvantages like limitation in memory layout~\cite{spatial_computation}.
+In addition, memory layout~\cite{spatial_computation} is another limitation of such approach.
 
 More recent works like Elastic Circuit~\cite{elasticCircuit, elasticFlow}, CGPA~\cite{cgpa} and ~\cite{josipovic_fpga_2018_dynamically} use dynamically schedule circuit to avoid the limitations in inferring loop pipelining.
 The idea is to refine from triggering the operators through centralized pre-planned controller but to take scheduling decisions locally in the circuit as it runs.
-Therefore, as soon as all the conditions for execution of an operation is satisfied the node has to do the operations.
+Therefore, as soon as all the conditions for execution of an operation is satisfied the node has to execute.
 Figure~\ref{fig:dynamic_schedule} shows the execution of a dynamically scheduled HLS circuit.
 The key reason to a good execution of this loop is that, ideally, a new value of \code{i} should be used to start computing \code{A[i] - B[i]} on every cycle.
 While this technique can dynamically provides better schedule compare to other statically scheduled HLS techniques.
@@ -376,8 +376,8 @@ But it is clear that, as in the case of processors, taking scheduling decisions 
     \caption{Dynamically schedule}
 \end{figure}  
 
-Overall all the pure C-to-gates HLS techniques described up to here, rely on capturing parallelism between fine-grain operations of sequential code by constructing the control and dataflow graph (CDFG) of the computation kernels.
-Then they use either scheduling algorithms or dynamic techniques to extract parallelism between the operations that are provably independent in the CDFG.
+Overall, all the pure C-to-gates HLS techniques described up to here, rely on capturing parallelism between fine-grain operations of sequential code by constructing the control and dataflow graph (CDFG) of the computation kernels.
+Then, they use either scheduling algorithms or dynamic techniques to extract parallelism between the operations that are provably independent in the CDFG.
 However, these techniques are less effective in capturing coarse-grain parallelism.
 Hence, the Quality of Results (QoR) of these HLS tools are often lower than that of manual design process using low-level hardware-description languages.
 Because the highest performance hardware exploits both fine-grain and coarse-grain parallelism.
@@ -387,31 +387,40 @@ For example, CatapultC~\cite{catapult} and Vivado~\cite{vivado} accepts SystemC~
 Vivado, also, accepts parallel functions/code-blocks communicating through dataflow channels.
 Altera openCL compiler~\cite{opencl_sdk} accepts single instruction multiple thread (SIMT) programming model. 
 CMOST~\cite{zhang_DAC_2015_cmost} is a C-to-FPGA framework that uses task-level modeling to exploit multi-level parallelism.
-ParallelXL~\cite{chen_micro_2018_parallelXL} adopts continuation passing mechanism to express computation as a dynamic task graph with explicit dependencies.
+In all these works, the number of input/output iterations and the execution time of each dataflow node for processing the input iteration need to be \emph{static} and known at compile time.
+The HLS tools create multiple hardware execution units onto which successive loop iterations are statically scheduled at the hardware construction time.
+The down side of this approach is HLS tools must plan for the worst case and allocate resources for all possible iterations regardless of whether they are actually executed, and must handle corner cases.
+
+The alternative approach is task parallelism or \emph{dynamic parallelism}.
+The term dynamic parallelism refers to enabling tasks to vary at run-time, both in terms of the type of child task spawned and the number of child tasks spawned.
+TAPAS~\cite{margerm_2018_tapas} and ParallelXL~\cite{chen_micro_2018_parallelXL} are the two recent works that addressed the following paradigm.
+TAPAS uses a parallel compiler intermediate-representation and includes support for arbitrarily nested parallelism and irregular task parallelism.
+And then it builds a parallel accelerator with using a library of hardware components to synthesize spawning and synchronizing tasks, buffering tasks, and inter-task communication.
+In contrast, ParallelXL~\cite{chen_micro_2018_parallelXL} adopts continuation passing mechanism to express computation as a dynamic task graph with explicit dependencies.
 Using continuation framework as foundation, ParallelXL builds other constructs such as data-parallel loops and for-join patterns on top of it.
-ParallelXL implementation is a mixture of HCL languages to implement system architecture and standard HLS tools to implement task elements.
+The main disadvantage of dynamic parallelism versus static parallelism is trading off performance against hardware utilization.
 
-In this methodology, however, the number of input/output iterations and the execution time of each dataflow node for processing the input iteration need to be static and known at compiler time.
-Due to this static nature of the synchronous data flow (SDF) model, statically scheduled HLS frameworks can explore the space of a design using closed-form formulations, resulting in micro-architectures that achieve throughput and area goals independent of the input data values.
-SDF HLS, however, is restricted to regular applications such as signal processing and multi-media.
-Examples of such HLS tools with regular data accesses are Rigel~\cite{hegarty_2016_rigel} and Darkroom~\cite{darkroom} which generate Verilog, and PolyMage~\cite{mullapudi_asplos_2015_polymage} that generates OpenMP and C++ for high-level synthesis.
-Rigel and Darkroom support generation of specialized memory structures on FPGAs, such as line buffers, in order to capture reuse.
+%%%
+Because of regular data access and static nature of signal processing and multi-media workloads, recently there are explicit proposed image processing DSLs.
+The narrow domain allows these DSLs to offer high-level specification and more concise abstractions for specifying stencil operations.
+These languages usually rely on source-to-source translation and their implementation is a mixture of a DSL language (front-end) and standard HLS tools (back-end).
+Recent work on Halide~\cite{pldi13halide} has demonstrated targeting heterogeneous systems by generating intermediate C++ and Vivado HLS~\cite{halidefpga}.
+Rigel~\cite{hegarty2016rigel} and Darkroom~\cite{hegarty2014darkroom} generate Verilog, and PolyMage~\cite{chugh2016dsl} generates OpenMP and C++ for high-level synthesis.
+Rigel and Darkroom support generation of specialized memory structures, such as line buffers, in order to capture reuse. $HIPA^{CC}$ can infer memory hierarchy on GPUs from a fix set of access patterns.
+These DSLs capture parallelism within a given stencil, typically across image channels and across the image processing pipeline.
+The limitations with image-processing DSLs are: 1)the solution is not generalized and it is only limited for a specific domain, 2)since they use standard HLS tools as back-end, they inherent the limitations of those tools such as limitation for arbitrary loop hierarchies and memory optimizations like automatically banking, buffering and duplicating structures for arbitrary data access patterns. 
 
-In irregular dataflow applications, however, the memory accesses are usually global and second the processing time of each kernels is dependent on data. 
-Gorilla~\cite{lavasani_thesis}++ is a language and compiler which tackle these problems for irregular  data-stream applications.
-Gorilla++ language model provides safe and efficient mechanism to access global resources using multi-threading and lock based synchronization.
-To overcome on static approach's limitations, the Gorilla compiler uses profile driven optimizations to iteratively refine an accelerator using generic refinement rules for a given input data-set.
-Using this approach the generated micro-architecture might not be optimized for other input data-sets however.
+There are other HLS works that target irregular dataflow applications.
+In these applications, the memory accesses are usually global and the processing time of each kernels is dependent on data. 
+Gorilla~\cite{lavasani_thesis}++ as a language and compiler, tackles this specific type of applications.
+In Gorilla++, language model provides an efficient mechanism to access global resources using multi-threading and lock based synchronization.
 
-Lime~\cite{lime} is a Java-based programming model and runtime from IBM which aims to provide a single unified language to program heterogeneous architectures like FPGAs.
-Lime only synthesis a portion of program that recognized as non-hard-to-synthesize.
-Lime natively supports custom bit precisions and includes collection operations, with parallelism in such operations inferred by the compiler.
-Coarse-grained pipeline and data parallelism are expressed through ``tasks''.
-Coarse-grained streaming computation graphs can be constructed using built-in constructs like \texttt{\small{connect}}, \texttt{\small{split}}, and \texttt{\small{join}}.
-The Lime runtime system handles buffering, partitioning, and scheduling of stream graphs.
-However, coarse-grained pipelines which deviate from the streaming model are not supported, and the programmer has to use a low-level messaging API to handle coarse-grained graphs with feedback loops.
-Additionally, the compiler does not perform automatic design tuning.
-Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
-
-Another example of non-C language base HLS tool is Kiwi~\cite{kiwi}.
-Kiwi translates a set of $C\#$ parallel constructs (e.g., event, monitor, and lock) to corresponding hardware units.
+% Lime~\cite{lime} is a Java-based programming model and runtime from IBM which aims to provide a single unified language to program heterogeneous architectures like FPGAs.
+% Lime only synthesis a portion of program that recognized as non-hard-to-synthesize.
+% Lime natively supports custom bit precisions and includes collection operations, with parallelism in such operations inferred by the compiler.
+% Coarse-grained pipeline and data parallelism are expressed through ``tasks''.
+% Coarse-grained streaming computation graphs can be constructed using built-in constructs like \texttt{\small{connect}}, \texttt{\small{split}}, and \texttt{\small{join}}.
+% The Lime runtime system handles buffering, partitioning, and scheduling of stream graphs.
+% However, coarse-grained pipelines which deviate from the streaming model are not supported, and the programmer has to use a low-level messaging API to handle coarse-grained graphs with feedback loops.
+% Additionally, the compiler does not perform automatic design tuning.
+% Finally, the compiler's ability to instantiate banked and buffered memories is unclear as details on banking multi-dimensional data structures for arbitrary access patterns are not specified.
