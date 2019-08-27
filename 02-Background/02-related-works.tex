@@ -405,8 +405,8 @@ The main disadvantage of dynamic parallelism versus static parallelism is tradin
 Because of regular data access and static nature of signal processing and multi-media workloads, recently there are explicit proposed image processing DSLs.
 The narrow domain allows these DSLs to offer high-level specification and more concise abstractions for specifying stencil operations.
 These languages usually rely on source-to-source translation and their implementation is a mixture of a DSL language (front-end) and standard HLS tools (back-end).
-Recent work on Halide~\cite{pldi13halide} has demonstrated targeting heterogeneous systems by generating intermediate C++ and Vivado HLS~\cite{halidefpga}.
-Rigel~\cite{hegarty2016rigel} and Darkroom~\cite{hegarty2014darkroom} generate Verilog, and PolyMage~\cite{chugh2016dsl} generates OpenMP and C++ for high-level synthesis.
+Recent work on Halide~\cite{halide_pldi_2013} has demonstrated targeting heterogeneous systems by generating intermediate C++ and Vivado HLS~\cite{halide_fpga}.
+Rigel~\cite{hegarty2016rigel} and Darkroom~\cite{darkroom} generate Verilog, and PolyMage~\cite{chugh_pact_2016} generates OpenMP and C++ for high-level synthesis.
 Rigel and Darkroom support generation of specialized memory structures, such as line buffers, in order to capture reuse. $HIPA^{CC}$ can infer memory hierarchy on GPUs from a fix set of access patterns.
 These DSLs capture parallelism within a given stencil, typically across image channels and across the image processing pipeline.
 The limitations with image-processing DSLs are: 1)the solution is not generalized and it is only limited for a specific domain, 2)since they use standard HLS tools as back-end, they inherent the limitations of those tools such as limitation for arbitrary loop hierarchies and memory optimizations like automatically banking, buffering and duplicating structures for arbitrary data access patterns. 
